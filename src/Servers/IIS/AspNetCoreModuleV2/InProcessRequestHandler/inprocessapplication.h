@@ -163,6 +163,7 @@ private:
     std::atomic<PFN_REQUESTS_DRAINED_HANDLER>    m_RequestsDrainedHandler;
 
     std::wstring                    m_dotnetExeKnownLocation;
+    std::wstring                    m_shadowCopyDirectory;
 
     std::atomic_bool                m_blockManagedCallbacks;
     bool                            m_Initialized;
@@ -177,6 +178,7 @@ private:
     std::shared_ptr<StringStreamRedirectionOutput> m_stringRedirectionOutput;
 
     inline static const LPCSTR      s_exeLocationParameterName = "InProcessExeLocation";
+
 
     VOID
     UnexpectedThreadExit(const ExecuteClrContext& context) const;

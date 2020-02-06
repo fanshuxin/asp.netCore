@@ -9,7 +9,7 @@ using System.Security.Cryptography;
 
 namespace RepoTasks
 {
-    public class GenerateChecksums : BuildTask
+    public class GenerateChecksums : Task
     {
         /// <summary>
         /// An item collection of files for which to generate checksums.  Each item must have metadata

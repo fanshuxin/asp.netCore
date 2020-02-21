@@ -179,6 +179,43 @@ namespace Microsoft.AspNetCore.Http
             get { return RequestBodyPipeFeature.Reader; }
         }
 
+        public override bool HasJsonContentType
+        {
+            get
+            {
+                MediaTypeHeaderValue.TryParse(ContentType, out var mediaType);
+                if (mediaType == null)
+                {
+                    return false;
+                }
+
+                if (mediaType.Type.Equals("application", StringComparison.Ordinal))
+                {
+                    // application/json
+                    if (mediaType.SubType.Equals("json", StringComparison.Ordinal))
+                    {
+                        return true;
+                    }
+
+                    // application/product+json
+                    else if (mediaType.Suffix.Equals("json", StringComparison.Ordinal))
+                    {
+                        return true;
+                    }
+                }
+                else if (mediaType.Type.Equals("text", StringComparison.Ordinal))
+                {
+                    // text/json
+                    if (mediaType.SubType.Equals("json", StringComparison.Ordinal))
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+        }
+
         struct FeatureInterfaces
         {
             public IHttpRequestFeature Request;

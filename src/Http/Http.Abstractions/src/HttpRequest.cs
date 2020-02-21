@@ -132,5 +132,11 @@ namespace Microsoft.AspNetCore.Http
         /// </summary>
         /// <returns>The collection of route values for this request.</returns>
         public virtual RouteValueDictionary RouteValues { get; set; }
+
+        /// <summary>
+        /// Checks the Content-Type header for JSON types.
+        /// </summary>
+        /// <returns>true if the Content-Type header represents a JSON content type; otherwise, false.</returns>
+        public virtual bool HasJsonContentType => false;
     }
 }

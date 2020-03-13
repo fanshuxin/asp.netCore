@@ -13,7 +13,11 @@
     <!-- Include our "loose" PDBs when publishing symbols. -->
     <FilesToPublishToSymbolServer Include="$(ArtifactsDir)\symbols\**\*.pdb" />
 
-    <!-- Prepare for _PublishInstallersAndChecksums target. -->
+    <!-- Ensure the PDBArtifacts artifact isn't empty, avoiding irrelevant build warnings. -->
+    <FilesToPublishToSymbolServer Include="$(RepoRoot)\README.md"
+      Condition=" @(FilesToPublishToSymbolServer) == '' " />
+
+    <!-- Prepare for _PublishInstallers target. -->
     <_InstallersToPublish Remove="@(_InstallersToPublish)" />
     <_InstallersToPublish Include="$(ArtifactsDir)\packages\**\*.jar" UploadPathSegment="jar" />
     <_InstallersToPublish Include="$(ArtifactsDir)\packages\**\*.pom" UploadPathSegment="jar" />
@@ -31,7 +35,7 @@
   </ItemGroup>
 
   <Target Name="_PublishInstallersAndChecksums">
-    <!-- 
+    <!--
       This target is defined in eng/targets/Packaging.targets and included in every C# and F# project.
       We use Microsoft.AspNetCore.DeveloperCertificates.XPlat because it is a nonshipping package, and we need a non-stable version string to use as our publish location.
     -->

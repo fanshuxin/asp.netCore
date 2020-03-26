@@ -293,6 +293,23 @@
       <Output TaskParameter="Dependencies" ItemName="_BlazorResolvedAssembly" />
     </ResolveBlazorRuntimeDependencies>
 
+    <!--
+      Copying the resolved assemblies to an intermediate location is a workaround for an issue in
+      static web assets, which unconditionally retargets all SWA outputs to the wwwroot in publish
+      output. When the underlying issue is fixed in the SDK, we can stop this extra copy step.
+      See https://github.com/dotnet/aspnetcore/issues/19926
+    -->
+    <Copy
+      SourceFiles="@(_BlazorResolvedAssembly)"
+      DestinationFolder="$(_BlazorIntermediateOutputPath)unlinked">
+      <Output TaskParameter="CopiedFiles" ItemName="_BlazorResolvedAssemblyCopy" />
+    </Copy>
+    <ItemGroup>
+      <FileWrites Include="@(_BlazorResolvedAssemblyCopy)" />
+      <_BlazorResolvedAssembly Remove="@(_BlazorResolvedAssembly)" />
+      <_BlazorResolvedAssembly Include="@(_BlazorResolvedAssemblyCopy)" />
+    </ItemGroup>
+
     <WriteLinesToFile File="$(_BlazorApplicationAssembliesCacheFile)" Lines="@(_BlazorResolvedAssembly)" Overwrite="true" />
 
     <ItemGroup>

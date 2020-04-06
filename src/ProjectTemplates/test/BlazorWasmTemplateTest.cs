@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -86,7 +87,8 @@ namespace Templates.Test
                 ErrorMessages.GetFailedProcessMessageOrEmpty("Run published project", serverProject, aspNetProcess.Process));
 
             await aspNetProcess.AssertStatusCode("/", HttpStatusCode.OK, "text/html");
-            await AssertCompressionFormat(aspNetProcess, "br");
+            await AssertCompressionFormat(aspNetProcess, new[] { "gzip", "deflate", "br" }, "br");
+            await AssertCompressionFormat(aspNetProcess, new[] { "*" }, "br");
             if (BrowserFixture.IsHostAutomationSupported())
             {
                 aspNetProcess.VisitInBrowser(Browser);
@@ -98,16 +100,16 @@ namespace Templates.Test
             }
         }
 
-        private static async Task AssertCompressionFormat(AspNetProcess aspNetProcess, string expectedEncoding)
+        private static async Task AssertCompressionFormat(AspNetProcess aspNetProcess, IEnumerable<string> acceptEncodings, string expectedEncoding)
         {
             var response = await aspNetProcess.SendRequest(() =>
             {
                 var request = new HttpRequestMessage(HttpMethod.Get, new Uri(aspNetProcess.ListeningUri, "/_framework/blazor.boot.json"));
-                // These are the same as chrome
                 request.Headers.AcceptEncoding.Clear();
-                request.Headers.AcceptEncoding.Add(StringWithQualityHeaderValue.Parse("gzip"));
-                request.Headers.AcceptEncoding.Add(StringWithQualityHeaderValue.Parse("deflate"));
-                request.Headers.AcceptEncoding.Add(StringWithQualityHeaderValue.Parse("br"));
+                foreach (var acceptEncoding in acceptEncodings)
+                {
+                    request.Headers.AcceptEncoding.Add(StringWithQualityHeaderValue.Parse(acceptEncoding));
+                }
 
                 return request;
             });
@@ -409,7 +411,7 @@ namespace Templates.Test
 
             await aspNetProcess.AssertStatusCode("/", HttpStatusCode.OK, "text/html");
             // We only do brotli precompression for published apps
-            await AssertCompressionFormat(aspNetProcess, "gzip");
+            await AssertCompressionFormat(aspNetProcess, new[] { "gzip", "deflate", "br" }, "gzip");
             if (BrowserFixture.IsHostAutomationSupported())
             {
                 aspNetProcess.VisitInBrowser(Browser);

@@ -331,7 +331,7 @@ namespace Microsoft.AspNetCore.Cors.Infrastructure
             var mockProvider = new Mock<ICorsPolicyProvider>();
             var loggerFactory = NullLoggerFactory.Instance;
             mockProvider.Setup(o => o.GetPolicyAsync(It.IsAny<HttpContext>(), It.IsAny<string>()))
-                .Returns(Task.FromResult<CorsPolicy>(null))
+                .Returns(Task.FromResult<CorsPolicy?>(null))
                 .Verifiable();
 
             var middleware = new CorsMiddleware(
@@ -360,7 +360,7 @@ namespace Microsoft.AspNetCore.Cors.Infrastructure
             var mockProvider = new Mock<ICorsPolicyProvider>();
             var loggerFactory = NullLoggerFactory.Instance;
             mockProvider.Setup(o => o.GetPolicyAsync(It.IsAny<HttpContext>(), It.IsAny<string>()))
-                .Returns(Task.FromResult<CorsPolicy>(null))
+                .Returns(Task.FromResult<CorsPolicy?>(null))
                 .Verifiable();
 
             var middleware = new CorsMiddleware(
@@ -617,7 +617,7 @@ namespace Microsoft.AspNetCore.Cors.Infrastructure
             var mockProvider = new Mock<ICorsPolicyProvider>();
             var loggerFactory = NullLoggerFactory.Instance;
             mockProvider.Setup(o => o.GetPolicyAsync(It.IsAny<HttpContext>(), It.IsAny<string>()))
-                .Returns(Task.FromResult<CorsPolicy>(null))
+                .Returns(Task.FromResult<CorsPolicy?>(null))
                 .Verifiable();
 
             var middleware = new CorsMiddleware(
@@ -647,7 +647,7 @@ namespace Microsoft.AspNetCore.Cors.Infrastructure
             var mockProvider = new Mock<ICorsPolicyProvider>();
             var loggerFactory = NullLoggerFactory.Instance;
             mockProvider.Setup(o => o.GetPolicyAsync(It.IsAny<HttpContext>(), It.IsAny<string>()))
-                .Returns(Task.FromResult<CorsPolicy>(null))
+                .Returns(Task.FromResult<CorsPolicy?>(null))
                 .Verifiable();
 
             var middleware = new CorsMiddleware(
@@ -739,7 +739,7 @@ namespace Microsoft.AspNetCore.Cors.Infrastructure
             var mockProvider = new Mock<ICorsPolicyProvider>();
             var loggerFactory = NullLoggerFactory.Instance;
             mockProvider.Setup(o => o.GetPolicyAsync(It.IsAny<HttpContext>(), It.IsAny<string>()))
-                .Returns(Task.FromResult<CorsPolicy>(null))
+                .Returns(Task.FromResult<CorsPolicy?>(null))
                 .Verifiable();
 
             var middleware = new CorsMiddleware(
@@ -771,7 +771,7 @@ namespace Microsoft.AspNetCore.Cors.Infrastructure
             var mockProvider = new Mock<ICorsPolicyProvider>();
             var loggerFactory = NullLoggerFactory.Instance;
             mockProvider.Setup(o => o.GetPolicyAsync(It.IsAny<HttpContext>(), It.IsAny<string>()))
-                .Returns(Task.FromResult<CorsPolicy>(null))
+                .Returns(Task.FromResult<CorsPolicy?>(null))
                 .Verifiable();
             mockCorsService.Setup(o => o.EvaluatePolicy(It.IsAny<HttpContext>(), It.IsAny<CorsPolicy>()))
                 .Returns(new CorsResult())
@@ -808,7 +808,7 @@ namespace Microsoft.AspNetCore.Cors.Infrastructure
             var mockProvider = new Mock<ICorsPolicyProvider>();
             var loggerFactory = NullLoggerFactory.Instance;
             mockProvider.Setup(o => o.GetPolicyAsync(It.IsAny<HttpContext>(), It.IsAny<string>()))
-                .Returns(Task.FromResult<CorsPolicy>(null))
+                .Returns(Task.FromResult<CorsPolicy?>(null))
                 .Verifiable();
             mockCorsService.Setup(o => o.EvaluatePolicy(It.IsAny<HttpContext>(), It.IsAny<CorsPolicy>()))
                 .Returns(new CorsResult())
@@ -844,7 +844,7 @@ namespace Microsoft.AspNetCore.Cors.Infrastructure
             var mockProvider = new Mock<ICorsPolicyProvider>();
             var loggerFactory = NullLoggerFactory.Instance;
             mockProvider.Setup(o => o.GetPolicyAsync(It.IsAny<HttpContext>(), It.IsAny<string>()))
-                .Returns(Task.FromResult<CorsPolicy>(null))
+                .Returns(Task.FromResult<CorsPolicy?>(null))
                 .Verifiable();
 
             var middleware = new CorsMiddleware(
@@ -874,7 +874,7 @@ namespace Microsoft.AspNetCore.Cors.Infrastructure
             var mockProvider = new Mock<ICorsPolicyProvider>();
             var loggerFactory = NullLoggerFactory.Instance;
             mockProvider.Setup(o => o.GetPolicyAsync(It.IsAny<HttpContext>(), It.IsAny<string>()))
-                .Returns(Task.FromResult<CorsPolicy>(null))
+                .Returns(Task.FromResult<CorsPolicy?>(null))
                 .Verifiable();
 
             var middleware = new CorsMiddleware(

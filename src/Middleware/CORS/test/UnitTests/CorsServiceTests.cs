@@ -921,17 +921,17 @@ namespace Microsoft.AspNetCore.Cors.Infrastructure
             Assert.False(result.IsOriginAllowed);
         }
 
-        private static CorsService GetCorsService(CorsOptions options = null)
+        private static CorsService GetCorsService(CorsOptions? options = null)
         {
             options = options ?? new CorsOptions();
             return new CorsService(Options.Create(options), NullLoggerFactory.Instance);
         }
 
         private static HttpContext GetHttpContext(
-            string method = null,
-            string origin = null,
-            string accessControlRequestMethod = null,
-            string[] accessControlRequestHeaders = null)
+            string? method = null,
+            string? origin = null,
+            string? accessControlRequestMethod = null,
+            string[]? accessControlRequestHeaders = null)
         {
             var context = new DefaultHttpContext();
 

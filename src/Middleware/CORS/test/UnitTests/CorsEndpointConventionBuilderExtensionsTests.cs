@@ -30,7 +30,7 @@ namespace Microsoft.AspNetCore.Cors.Infrastructure
 
             var metadata = endpoint.Metadata.GetMetadata<IEnableCorsAttribute>();
             Assert.NotNull(metadata);
-            Assert.Equal("TestPolicyName", metadata.PolicyName);
+            Assert.Equal("TestPolicyName", metadata!.PolicyName);
         }
 
         [Fact]
@@ -51,7 +51,7 @@ namespace Microsoft.AspNetCore.Cors.Infrastructure
 
             var metadata = endpoint.Metadata.GetMetadata<ICorsPolicyMetadata>();
             Assert.NotNull(metadata);
-            Assert.NotNull(metadata.Policy);
+            Assert.NotNull(metadata!.Policy);
             Assert.True(metadata.Policy.AllowAnyOrigin);
         }
 
@@ -72,7 +72,7 @@ namespace Microsoft.AspNetCore.Cors.Infrastructure
         {
             public override Endpoint Build()
             {
-                return new Endpoint(RequestDelegate, new EndpointMetadataCollection(Metadata), DisplayName);
+                return new Endpoint(RequestDelegate!, new EndpointMetadataCollection(Metadata), DisplayName!);
             }
         }
 

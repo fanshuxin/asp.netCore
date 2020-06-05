@@ -16,7 +16,7 @@ namespace Microsoft.AspNetCore.Cors.Infrastructure
 
         // DefaultCorsPolicyProvider returns a Task<CorsPolicy>. We'll cache the value to be returned alongside
         // the actual policy instance to have a separate lookup.
-        internal IDictionary<string, (CorsPolicy policy, Task<CorsPolicy> policyTask)> PolicyMap { get; }
+        internal Dictionary<string, (CorsPolicy policy, Task<CorsPolicy> policyTask)> PolicyMap { get; }
             = new Dictionary<string, (CorsPolicy, Task<CorsPolicy>)>(StringComparer.Ordinal);
 
         public string DefaultPolicyName
@@ -105,7 +105,7 @@ namespace Microsoft.AspNetCore.Cors.Infrastructure
         /// </summary>
         /// <param name="name">The name of the policy to lookup.</param>
         /// <returns>The <see cref="CorsPolicy"/> if the policy was added.<c>null</c> otherwise.</returns>
-        public CorsPolicy GetPolicy(string name)
+        public CorsPolicy? GetPolicy(string name)
         {
             if (name == null)
             {

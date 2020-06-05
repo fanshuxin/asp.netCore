@@ -31,8 +31,8 @@ namespace Microsoft.AspNetCore.Cors
     public partial class EnableCorsAttribute : System.Attribute, Microsoft.AspNetCore.Cors.Infrastructure.ICorsMetadata, Microsoft.AspNetCore.Cors.Infrastructure.IEnableCorsAttribute
     {
         public EnableCorsAttribute() { }
-        public EnableCorsAttribute(string policyName) { }
-        public string PolicyName { [System.Runtime.CompilerServices.CompilerGeneratedAttribute] get { throw null; } [System.Runtime.CompilerServices.CompilerGeneratedAttribute] set { } }
+        public EnableCorsAttribute(string? policyName) { }
+        public string? PolicyName { [System.Runtime.CompilerServices.CompilerGeneratedAttribute] get { throw null; } [System.Runtime.CompilerServices.CompilerGeneratedAttribute] set { } }
     }
 }
 namespace Microsoft.AspNetCore.Cors.Infrastructure
@@ -55,7 +55,7 @@ namespace Microsoft.AspNetCore.Cors.Infrastructure
     {
         public CorsMiddleware(Microsoft.AspNetCore.Http.RequestDelegate next, Microsoft.AspNetCore.Cors.Infrastructure.ICorsService corsService, Microsoft.AspNetCore.Cors.Infrastructure.CorsPolicy policy, Microsoft.Extensions.Logging.ILoggerFactory loggerFactory) { }
         public CorsMiddleware(Microsoft.AspNetCore.Http.RequestDelegate next, Microsoft.AspNetCore.Cors.Infrastructure.ICorsService corsService, Microsoft.Extensions.Logging.ILoggerFactory loggerFactory) { }
-        public CorsMiddleware(Microsoft.AspNetCore.Http.RequestDelegate next, Microsoft.AspNetCore.Cors.Infrastructure.ICorsService corsService, Microsoft.Extensions.Logging.ILoggerFactory loggerFactory, string policyName) { }
+        public CorsMiddleware(Microsoft.AspNetCore.Http.RequestDelegate next, Microsoft.AspNetCore.Cors.Infrastructure.ICorsService corsService, Microsoft.Extensions.Logging.ILoggerFactory loggerFactory, string? policyName) { }
         public System.Threading.Tasks.Task Invoke(Microsoft.AspNetCore.Http.HttpContext context, Microsoft.AspNetCore.Cors.Infrastructure.ICorsPolicyProvider corsPolicyProvider) { throw null; }
     }
     public partial class CorsOptions
@@ -66,7 +66,7 @@ namespace Microsoft.AspNetCore.Cors.Infrastructure
         public void AddDefaultPolicy(System.Action<Microsoft.AspNetCore.Cors.Infrastructure.CorsPolicyBuilder> configurePolicy) { }
         public void AddPolicy(string name, Microsoft.AspNetCore.Cors.Infrastructure.CorsPolicy policy) { }
         public void AddPolicy(string name, System.Action<Microsoft.AspNetCore.Cors.Infrastructure.CorsPolicyBuilder> configurePolicy) { }
-        public Microsoft.AspNetCore.Cors.Infrastructure.CorsPolicy GetPolicy(string name) { throw null; }
+        public Microsoft.AspNetCore.Cors.Infrastructure.CorsPolicy? GetPolicy(string name) { throw null; }
     }
     public partial class CorsPolicy
     {
@@ -107,7 +107,7 @@ namespace Microsoft.AspNetCore.Cors.Infrastructure
         public System.Collections.Generic.IList<string> AllowedExposedHeaders { [System.Runtime.CompilerServices.CompilerGeneratedAttribute] get { throw null; } }
         public System.Collections.Generic.IList<string> AllowedHeaders { [System.Runtime.CompilerServices.CompilerGeneratedAttribute] get { throw null; } }
         public System.Collections.Generic.IList<string> AllowedMethods { [System.Runtime.CompilerServices.CompilerGeneratedAttribute] get { throw null; } }
-        public string AllowedOrigin { [System.Runtime.CompilerServices.CompilerGeneratedAttribute] get { throw null; } [System.Runtime.CompilerServices.CompilerGeneratedAttribute] set { } }
+        public string? AllowedOrigin { [System.Runtime.CompilerServices.CompilerGeneratedAttribute] get { throw null; } [System.Runtime.CompilerServices.CompilerGeneratedAttribute] set { } }
         public bool IsOriginAllowed { [System.Runtime.CompilerServices.CompilerGeneratedAttribute] get { throw null; } [System.Runtime.CompilerServices.CompilerGeneratedAttribute] set { } }
         public bool IsPreflightRequest { [System.Runtime.CompilerServices.CompilerGeneratedAttribute] get { throw null; } [System.Runtime.CompilerServices.CompilerGeneratedAttribute] set { } }
         public System.TimeSpan? PreflightMaxAge { get { throw null; } set { } }
@@ -127,7 +127,7 @@ namespace Microsoft.AspNetCore.Cors.Infrastructure
     public partial class DefaultCorsPolicyProvider : Microsoft.AspNetCore.Cors.Infrastructure.ICorsPolicyProvider
     {
         public DefaultCorsPolicyProvider(Microsoft.Extensions.Options.IOptions<Microsoft.AspNetCore.Cors.Infrastructure.CorsOptions> options) { }
-        public System.Threading.Tasks.Task<Microsoft.AspNetCore.Cors.Infrastructure.CorsPolicy> GetPolicyAsync(Microsoft.AspNetCore.Http.HttpContext context, string policyName) { throw null; }
+        public System.Threading.Tasks.Task<Microsoft.AspNetCore.Cors.Infrastructure.CorsPolicy?> GetPolicyAsync(Microsoft.AspNetCore.Http.HttpContext context, string? policyName) { throw null; }
     }
     public partial interface ICorsPolicyMetadata : Microsoft.AspNetCore.Cors.Infrastructure.ICorsMetadata
     {
@@ -135,7 +135,7 @@ namespace Microsoft.AspNetCore.Cors.Infrastructure
     }
     public partial interface ICorsPolicyProvider
     {
-        System.Threading.Tasks.Task<Microsoft.AspNetCore.Cors.Infrastructure.CorsPolicy> GetPolicyAsync(Microsoft.AspNetCore.Http.HttpContext context, string policyName);
+        System.Threading.Tasks.Task<Microsoft.AspNetCore.Cors.Infrastructure.CorsPolicy?> GetPolicyAsync(Microsoft.AspNetCore.Http.HttpContext context, string? policyName);
     }
     public partial interface ICorsService
     {
@@ -147,7 +147,7 @@ namespace Microsoft.AspNetCore.Cors.Infrastructure
     }
     public partial interface IEnableCorsAttribute : Microsoft.AspNetCore.Cors.Infrastructure.ICorsMetadata
     {
-        string PolicyName { get; set; }
+        string? PolicyName { get; set; }
     }
 }
 namespace Microsoft.Extensions.DependencyInjection

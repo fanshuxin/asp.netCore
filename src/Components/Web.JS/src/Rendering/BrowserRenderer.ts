@@ -6,6 +6,7 @@ import { applyCaptureIdToElement } from './ElementReferenceCapture';
 import { EventFieldInfo } from './EventFieldInfo';
 import { dispatchEvent } from './RendererEventDispatcher';
 import { attachToEventDelegator as attachNavigationManagerToEventDelegator } from '../Services/NavigationManager';
+import { TimingRegion } from '../Services/TimingRegion';
 const selectValuePropname = '_blazorSelectValue';
 const sharedTemplateElemForParsing = document.createElement('template');
 const sharedSvgElemForParsing = document.createElementNS('http://www.w3.org/2000/svg', 'g');
@@ -40,6 +41,7 @@ export class BrowserRenderer {
   }
 
   public updateComponent(batch: RenderBatch, componentId: number, edits: ArrayBuilderSegment<RenderTreeEdit>, referenceFrames: ArrayValues<RenderTreeFrame>): void {
+    const timingRegion = TimingRegion.open('BrowserRenderer.updateComponent');
     const element = this.childComponentLocations[componentId];
     if (!element) {
       throw new Error(`No element is currently associated with component ${componentId}`);
@@ -67,14 +69,19 @@ export class BrowserRenderer {
     if ((activeElementBefore instanceof HTMLElement) && ownerDocument && ownerDocument.activeElement !== activeElementBefore) {
       activeElementBefore.focus();
     }
+    timingRegion.close();
   }
 
   public disposeComponent(componentId: number) {
+    const timingRegion = TimingRegion.open('BrowserRenderer.disposeComponent');
     delete this.childComponentLocations[componentId];
+    timingRegion.close();
   }
 
   public disposeEventHandler(eventHandlerId: number) {
+    const timingRegion = TimingRegion.open('BrowserRenderer.disposeEventHandler');
     this.eventDelegator.removeListener(eventHandlerId);
+    timingRegion.close();
   }
 
   private attachComponentToElement(componentId: number, element: LogicalElement) {
@@ -95,22 +102,28 @@ export class BrowserRenderer {
     const maxEditIndexExcl = editsOffset + editsLength;
 
     for (let editIndex = editsOffset; editIndex < maxEditIndexExcl; editIndex++) {
+      const timingRegion = TimingRegion.open('BrowserRenderer.applyEdits.eachEdit');
       const edit = batch.diffReader.editsEntry(editsValues, editIndex);
       const editType = editReader.editType(edit);
       switch (editType) {
         case EditType.prependFrame: {
+          const region = TimingRegion.open('BrowserRenderer.applyEdits.prependFrame');
           const frameIndex = editReader.newTreeIndex(edit);
           const frame = batch.referenceFramesEntry(referenceFrames, frameIndex);
           const siblingIndex = editReader.siblingIndex(edit);
           this.insertFrame(batch, componentId, parent, childIndexAtCurrentDepth + siblingIndex, referenceFrames, frame, frameIndex);
+          region.close();
           break;
         }
         case EditType.removeFrame: {
+          const region = TimingRegion.open('BrowserRenderer.applyEdits.removeFrame');
           const siblingIndex = editReader.siblingIndex(edit);
           removeLogicalChild(parent, childIndexAtCurrentDepth + siblingIndex);
+          region.close();
           break;
         }
         case EditType.setAttribute: {
+          const region = TimingRegion.open('BrowserRenderer.applyEdits.setAttribute');
           const frameIndex = editReader.newTreeIndex(edit);
           const frame = batch.referenceFramesEntry(referenceFrames, frameIndex);
           const siblingIndex = editReader.siblingIndex(edit);
@@ -120,9 +133,11 @@ export class BrowserRenderer {
           } else {
             throw new Error('Cannot set attribute on non-element child');
           }
+          region.close();
           break;
         }
         case EditType.removeAttribute: {
+          const region = TimingRegion.open('BrowserRenderer.applyEdits.removeAttribute');
           // Note that we don't have to dispose the info we track about event handlers here, because the
           // disposed event handler IDs are delivered separately (in the 'disposedEventHandlerIds' array)
           const siblingIndex = editReader.siblingIndex(edit);
@@ -137,9 +152,11 @@ export class BrowserRenderer {
           } else {
             throw new Error('Cannot remove attribute from non-element child');
           }
+          region.close();
           break;
         }
         case EditType.updateText: {
+          const region = TimingRegion.open('BrowserRenderer.applyEdits.updateText');
           const frameIndex = editReader.newTreeIndex(edit);
           const frame = batch.referenceFramesEntry(referenceFrames, frameIndex);
           const siblingIndex = editReader.siblingIndex(edit);
@@ -149,40 +166,51 @@ export class BrowserRenderer {
           } else {
             throw new Error('Cannot set text content on non-text child');
           }
+          region.close();
           break;
         }
         case EditType.updateMarkup: {
+          const region = TimingRegion.open('BrowserRenderer.applyEdits.updateMarkup');
           const frameIndex = editReader.newTreeIndex(edit);
           const frame = batch.referenceFramesEntry(referenceFrames, frameIndex);
           const siblingIndex = editReader.siblingIndex(edit);
           removeLogicalChild(parent, childIndexAtCurrentDepth + siblingIndex);
           this.insertMarkup(batch, parent, childIndexAtCurrentDepth + siblingIndex, frame);
+          region.close();
           break;
         }
         case EditType.stepIn: {
+          const region = TimingRegion.open('BrowserRenderer.applyEdits.stepIn');
           const siblingIndex = editReader.siblingIndex(edit);
           parent = getLogicalChild(parent, childIndexAtCurrentDepth + siblingIndex);
           currentDepth++;
           childIndexAtCurrentDepth = 0;
+          region.close();
           break;
         }
         case EditType.stepOut: {
+          const region = TimingRegion.open('BrowserRenderer.applyEdits.stepOut');
           parent = getLogicalParent(parent)!;
           currentDepth--;
           childIndexAtCurrentDepth = currentDepth === 0 ? childIndex : 0; // The childIndex is only ever nonzero at zero depth
+          region.close();
           break;
         }
         case EditType.permutationListEntry: {
+          const region = TimingRegion.open('BrowserRenderer.applyEdits.permutationListEntry');
           permutationList = permutationList || [];
           permutationList.push({
             fromSiblingIndex: childIndexAtCurrentDepth + editReader.siblingIndex(edit),
             toSiblingIndex: childIndexAtCurrentDepth + editReader.moveToSiblingIndex(edit),
           });
+          region.close();
           break;
         }
         case EditType.permutationListEnd: {
+          const region = TimingRegion.open('BrowserRenderer.applyEdits.permutationListEnd');
           permuteLogicalChildren(parent, permutationList!);
           permutationList = undefined;
+          region.close();
           break;
         }
         default: {
@@ -190,6 +218,7 @@ export class BrowserRenderer {
           throw new Error(`Unknown edit type: ${unknownType}`);
         }
       }
+      timingRegion.close();
     }
   }
 
@@ -198,27 +227,40 @@ export class BrowserRenderer {
     const frameType = frameReader.frameType(frame);
     switch (frameType) {
       case FrameType.element:
+        const elementRegion = TimingRegion.open('BrowserRenderer.insertFrame.element');
         this.insertElement(batch, componentId, parent, childIndex, frames, frame, frameIndex);
+        elementRegion.close();
         return 1;
       case FrameType.text:
+        const textRegion = TimingRegion.open('BrowserRenderer.insertFrame.text');
         this.insertText(batch, parent, childIndex, frame);
+        textRegion.close();
         return 1;
       case FrameType.attribute:
         throw new Error('Attribute frames should only be present as leading children of element frames.');
       case FrameType.component:
+        const componentRegion = TimingRegion.open('BrowserRenderer.insertFrame.component');
         this.insertComponent(batch, parent, childIndex, frame);
+        componentRegion.close();
         return 1;
       case FrameType.region:
-        return this.insertFrameRange(batch, componentId, parent, childIndex, frames, frameIndex + 1, frameIndex + frameReader.subtreeLength(frame));
+        const regionRegion = TimingRegion.open('BrowserRenderer.insertFrame.region');
+        const regionResult = this.insertFrameRange(batch, componentId, parent, childIndex, frames, frameIndex + 1, frameIndex + frameReader.subtreeLength(frame));
+        regionRegion.close();
+        return regionResult;
       case FrameType.elementReferenceCapture:
+        const elementReferenceCaptureRegion = TimingRegion.open('BrowserRenderer.insertFrame.elementReferenceCapture');
         if (parent instanceof Element) {
           applyCaptureIdToElement(parent, frameReader.elementReferenceCaptureId(frame)!);
+          elementReferenceCaptureRegion.close();
           return 0; // A "capture" is a child in the diff, but has no node in the DOM
         } else {
           throw new Error('Reference capture frames can only be children of element frames.');
         }
       case FrameType.markup:
+        const markupRegion = TimingRegion.open('BrowserRenderer.insertFrame.markup');
         this.insertMarkup(batch, parent, childIndex, frame);
+        markupRegion.close();
         return 1;
       default:
         const unknownType: never = frameType; // Compile-time verification that the switch was exhaustive

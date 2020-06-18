@@ -1,5 +1,6 @@
 import { EventForDotNet, UIEventArgs } from './EventForDotNet';
 import { EventFieldInfo } from './EventFieldInfo';
+import { TimingRegion } from '../Services/TimingRegion';
 
 const nonBubblingEvents = toLookup([
   'abort',
@@ -110,6 +111,9 @@ export class EventDelegator {
       if (handlerInfos) {
         const handlerInfo = handlerInfos.getHandler(evt.type);
         if (handlerInfo && !eventIsDisabledOnElement(candidateElement, evt.type)) {
+          const timingRegion = TimingRegion.open('EventDelegator.onGlobalEvent');
+          window['latestEventTimingRegion'] = timingRegion;
+
           // We are going to raise an event for this element, so prepare info needed by the .NET code
           if (!eventArgs) {
             eventArgs = EventForDotNet.fromDOMEvent(evt);
@@ -117,6 +121,8 @@ export class EventDelegator {
 
           const eventFieldInfo = EventFieldInfo.fromEvent(handlerInfo.renderingComponentId, evt);
           this.onEvent(evt, handlerInfo.eventHandlerId, eventArgs, eventFieldInfo);
+
+          timingRegion.close();
         }
 
         if (handlerInfos.stopPropagation(evt.type)) {

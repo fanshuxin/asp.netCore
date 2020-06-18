@@ -11,6 +11,7 @@ import { WebAssemblyConfigLoader } from './Platform/WebAssemblyConfigLoader';
 import { BootConfigResult } from './Platform/BootConfig';
 import { Pointer } from './Platform/Platform';
 import { WebAssemblyStartOptions } from './Platform/WebAssemblyStartOptions';
+import { TimingRegion } from './Services/TimingRegion';
 
 let started = false;
 
@@ -21,13 +22,22 @@ async function boot(options?: Partial<WebAssemblyStartOptions>): Promise<void> {
   }
   started = true;
 
-  setEventDispatcher((eventDescriptor, eventArgs) => DotNet.invokeMethodAsync('Microsoft.AspNetCore.Components.WebAssembly', 'DispatchEvent', eventDescriptor, JSON.stringify(eventArgs)));
+  setEventDispatcher((eventDescriptor, eventArgs) => {
+    const timingRegion = TimingRegion.open('[Microsoft.AspNetCore.Components.WebAssembly]::DispatchEvent');
+    try {
+      return DotNet.invokeMethodAsync('Microsoft.AspNetCore.Components.WebAssembly', 'DispatchEvent', eventDescriptor, JSON.stringify(eventArgs));
+    } finally {
+      timingRegion.close();
+    }
+  });
 
   // Configure environment for execution under Mono WebAssembly with shared-memory rendering
   const platform = Environment.setPlatform(monoPlatform);
   window['Blazor'].platform = platform;
   window['Blazor']._internal.renderBatch = (browserRendererId: number, batchAddress: Pointer) => {
+    const timingRegion = TimingRegion.open('Blazor._internal.renderBatch');
     renderBatch(browserRendererId, new SharedMemoryRenderBatch(batchAddress));
+    timingRegion.close();
   };
 
   // Configure navigation via JS Interop

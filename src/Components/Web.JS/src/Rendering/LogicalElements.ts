@@ -25,6 +25,8 @@
   - Whenever a logical child is added or removed, we update the parent's array of logical children
 */
 
+import { TimingRegion } from "../Services/TimingRegion";
+
 const logicalChildrenPropname = createSymbolOrFallback('_blazorLogicalChildren');
 const logicalParentPropname = createSymbolOrFallback('_blazorLogicalParent');
 const logicalEndSiblingPropname = createSymbolOrFallback('_blazorLogicalEnd');
@@ -86,6 +88,8 @@ export function createAndInsertLogicalContainer(parent: LogicalElement, childInd
 }
 
 export function insertLogicalChild(child: Node, parent: LogicalElement, childIndex: number) {
+  const timingRegion = TimingRegion.open('LogicalElements.insertLogicalChild');
+
   const childAsLogicalElement = child as any as LogicalElement;
   if (child instanceof Comment) {
     const existingGrandchildren = getLogicalChildrenArray(childAsLogicalElement);
@@ -123,9 +127,12 @@ export function insertLogicalChild(child: Node, parent: LogicalElement, childInd
   if (!(logicalChildrenPropname in childAsLogicalElement)) {
     childAsLogicalElement[logicalChildrenPropname] = [];
   }
+
+  timingRegion.close();
 }
 
 export function removeLogicalChild(parent: LogicalElement, childIndex: number) {
+  const timingRegion = TimingRegion.open('LogicalElements.removeLogicalChild');
   const childrenArray = getLogicalChildrenArray(parent);
   const childToRemove = childrenArray.splice(childIndex, 1)[0];
 
@@ -140,6 +147,7 @@ export function removeLogicalChild(parent: LogicalElement, childIndex: number) {
   // Finally, remove the node itself
   const domNodeToRemove = childToRemove as any as Node;
   domNodeToRemove.parentNode!.removeChild(domNodeToRemove);
+  timingRegion.close();
 }
 
 export function getLogicalParent(element: LogicalElement): LogicalElement | null {

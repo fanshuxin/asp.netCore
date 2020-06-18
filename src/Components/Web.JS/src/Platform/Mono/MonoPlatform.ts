@@ -5,6 +5,7 @@ import { WebAssemblyResourceLoader, LoadingResource } from '../WebAssemblyResour
 import { Platform, System_Array, Pointer, System_Object, System_String } from '../Platform';
 import { loadTimezoneData } from './TimezoneDataFile';
 import { WebAssemblyBootResourceType } from '../WebAssemblyStartOptions';
+import { TimingRegion } from '../../Services/TimingRegion';
 
 let mono_string_get_utf8: (managedString: System_String) => Pointer;
 let mono_wasm_add_assembly: (name: string, heapAddress: number, length: number) => void;
@@ -119,7 +120,10 @@ export const monoPlatform: Platform = {
       return unboxedValue;
     }
 
-    return BINDING.conv_string(fieldValue as any as System_String);
+    const timingRegion = TimingRegion.open('MonoPlatform.readStringField');
+    const result = BINDING.conv_string(fieldValue as any as System_String);
+    timingRegion.close();
+    return result;
   },
 
   readStructField: function readStructField<T extends Pointer>(baseAddress: Pointer, fieldOffset?: number): T {

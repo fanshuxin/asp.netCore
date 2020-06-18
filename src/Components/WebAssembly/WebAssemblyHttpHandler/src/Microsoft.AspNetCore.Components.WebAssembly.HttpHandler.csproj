@@ -5,7 +5,9 @@
     <PackageId>$(MSBuildProjectName)</PackageId>
     <AssemblyName>System.Net.Http.WebAssemblyHttpHandler</AssemblyName>
     <AssemblyVersion>0.2.2.0</AssemblyVersion>
+    <!--
     <ProduceOnlyReferenceAssembly>true</ProduceOnlyReferenceAssembly>
+    -->
     <StrongNameKeyId>Open</StrongNameKeyId>
   </PropertyGroup>
 

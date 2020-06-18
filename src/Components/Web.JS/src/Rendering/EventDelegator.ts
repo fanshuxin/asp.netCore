@@ -123,6 +123,7 @@ export class EventDelegator {
           this.onEvent(evt, handlerInfo.eventHandlerId, eventArgs, eventFieldInfo);
 
           timingRegion.close();
+          timingRegion.logAll();
         }
 
         if (handlerInfos.stopPropagation(evt.type)) {

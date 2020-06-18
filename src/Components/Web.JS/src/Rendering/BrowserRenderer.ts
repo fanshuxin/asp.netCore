@@ -101,6 +101,11 @@ export class BrowserRenderer {
     const editsLength = arrayBuilderSegmentReader.count(edits);
     const maxEditIndexExcl = editsOffset + editsLength;
 
+    if (editsOffset >= maxEditIndexExcl) {
+      return;
+    }
+
+    const componentWithEditRegion = TimingRegion.open('BrowserRenderer.applyEdits.forComponentWithEdit');
     for (let editIndex = editsOffset; editIndex < maxEditIndexExcl; editIndex++) {
       const timingRegion = TimingRegion.open('BrowserRenderer.applyEdits.eachEdit');
       const edit = batch.diffReader.editsEntry(editsValues, editIndex);
@@ -220,6 +225,7 @@ export class BrowserRenderer {
       }
       timingRegion.close();
     }
+    componentWithEditRegion.close();
   }
 
   private insertFrame(batch: RenderBatch, componentId: number, parent: LogicalElement, childIndex: number, frames: ArrayValues<RenderTreeFrame>, frame: RenderTreeFrame, frameIndex: number): number {

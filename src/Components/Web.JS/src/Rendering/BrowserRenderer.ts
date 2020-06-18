@@ -275,11 +275,14 @@ export class BrowserRenderer {
   }
 
   private insertElement(batch: RenderBatch, componentId: number, parent: LogicalElement, childIndex: number, frames: ArrayValues<RenderTreeFrame>, frame: RenderTreeFrame, frameIndex: number) {
+    const timingRegion = TimingRegion.open('BrowserRenderer.insertElement - Creating element');
     const frameReader = batch.frameReader;
     const tagName = frameReader.elementName(frame)!;
     const newDomElementRaw = tagName === 'svg' || isSvgElement(parent) ?
       document.createElementNS('http://www.w3.org/2000/svg', tagName) :
       document.createElement(tagName);
+    timingRegion.close();
+
     const newElement = toLogicalElement(newDomElementRaw);
     insertLogicalChild(newDomElementRaw, parent, childIndex);
 

@@ -163,7 +163,10 @@ export function getLogicalChild(parent: LogicalElement, childIndex: number): Log
 }
 
 export function isSvgElement(element: LogicalElement) {
-  return getClosestDomElement(element).namespaceURI === 'http://www.w3.org/2000/svg';
+  const timingRegion = TimingRegion.open('BrowserRenderer.isSvgElement');
+  const result = getClosestDomElement(element).namespaceURI === 'http://www.w3.org/2000/svg';
+  timingRegion.close();
+  return result;
 }
 
 export function getLogicalChildrenArray(element: LogicalElement) {

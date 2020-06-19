@@ -37,6 +37,11 @@ namespace Microsoft.AspNetCore.Components.WebAssembly.Hosting
         private bool _started;
         private WebAssemblyRenderer _renderer;
 
+        static WebAssemblyHost()
+        {
+            TimingRegion.Impl = new WebAssemblyTimingRegionImpl();
+        }
+
         internal WebAssemblyHost(IServiceProvider services, IServiceScope scope, IConfiguration configuration, RootComponentMapping[] rootComponents)
         {
             // To ensure JS-invoked methods don't get linked out, have a reference to their enclosing types

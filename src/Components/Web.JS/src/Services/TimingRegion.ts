@@ -1,3 +1,5 @@
+import { System_String } from '../Platform/Platform';
+
 export class TimingRegion {
     static currentRegionsStack: TimingRegion[] = [];
 
@@ -73,19 +75,21 @@ export class TimingRegion {
                 'color: blue');
         }
 
-        logTopDownEntry('group', this.name, this.totalCount, this.totalDuration);
+        const sortedChildren = Object.values(this.children).sort((a, b) => b.totalDuration - a.totalDuration);
+        const hasChildren = !!sortedChildren.length;
+        logTopDownEntry(hasChildren ? 'group' : 'log', this.name, this.totalCount, this.totalDuration);
 
         let durationAccounted = 0;
-        const sortedChildren = Object.values(this.children).sort((a, b) => b.totalDuration - a.totalDuration);
         sortedChildren.forEach(child => {
             durationAccounted += child.totalDuration;
             child.logTopDown();
         });
 
         this.totalDurationExcludingChildren = this.totalDuration - durationAccounted;
-        logTopDownEntry('log', '(Unaccounted)', null, this.totalDurationExcludingChildren);
-
-        console.groupEnd();
+        if (hasChildren) {
+            logTopDownEntry('log', '(Unaccounted)', null, this.totalDurationExcludingChildren);
+            console.groupEnd();
+        }
     }
 
     public logFlattened() {
@@ -109,29 +113,27 @@ export class TimingRegion {
             Object.values(region.children).forEach(processRecursive);
         }
     }
-
-    public static fromDotNetTimingRegion(source: DotNetTimingRegion): TimingRegion {
-        const result = new TimingRegion(source.name);
-        result.totalCount = source.totalCount;
-        result.totalDuration = source.totalDuration;
-        result.children = {};
-        Object.values(source.children).forEach(sourceChild => {
-            result.children[sourceChild.name] = TimingRegion.fromDotNetTimingRegion(sourceChild);
-        });
-        return result;
-    }
 }
 
 // For logging .NET's TimingRegion
+const dotnetTimingRegionHandles = new Map<number, TimingRegion>();
+let nextDotnetTimingRegionHandleId = 1;
+
 window['timingRegion'] = {
-    logFromDotNet: function(region: DotNetTimingRegion) {
-        TimingRegion.fromDotNetTimingRegion(region).logAll();
+    open: function(name: System_String) {
+        const nameAsJsString = BINDING.conv_string(name)!;
+        const region = TimingRegion.open(nameAsJsString);
+        const thisRegionId = nextDotnetTimingRegionHandleId++;
+        dotnetTimingRegionHandles.set(thisRegionId, region);
+        return thisRegionId;
+    },
+    close: function(id: number) {
+        const region = dotnetTimingRegionHandles.get(id);
+        if (!region) {
+            throw new Error(`No such timing region: ${id}`);
+        }
+        dotnetTimingRegionHandles.delete(id);
+
+        region.close();
     }
 };
-
-interface DotNetTimingRegion {
-    name: string;
-    totalCount: number;
-    totalDuration: number;
-    children: { [name: string]: DotNetTimingRegion };
-}

@@ -117,11 +117,19 @@ export class TimingRegion {
 
 // For logging .NET's TimingRegion
 const dotnetTimingRegionHandles = new Map<number, TimingRegion>();
+const cachedTimingRegionNames = new Map<System_String, string>();
 let nextDotnetTimingRegionHandleId = 1;
 
 window['timingRegion'] = {
     open: function(name: System_String) {
-        const nameAsJsString = BINDING.conv_string(name)!;
+        // This would be very dangerous in general since the .NET GC could move things about
+        // However since all the region names come from const strings, they won't move in practice
+        // Also it makes a huge difference (reducing the timing overhead from ~70% to ~10%)
+        if (!cachedTimingRegionNames.has(name)) {
+            cachedTimingRegionNames.set(name, BINDING.conv_string(name)!);
+        }
+
+        const nameAsJsString = cachedTimingRegionNames.get(name)!;
         const region = TimingRegion.open(nameAsJsString);
         const thisRegionId = nextDotnetTimingRegionHandleId++;
         dotnetTimingRegionHandles.set(thisRegionId, region);

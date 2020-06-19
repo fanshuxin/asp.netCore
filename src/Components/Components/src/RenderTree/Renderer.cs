@@ -432,7 +432,10 @@ namespace Microsoft.AspNetCore.Components.RenderTree
                 }
 
                 var batch = _batchBuilder.ToBatch();
+
+                var updateDisplayRegion = TimingRegion.Open($"{nameof(Renderer)}.{nameof(ProcessRenderQueue)} - call UpdateDisplayAsync");
                 updateDisplayTask = UpdateDisplayAsync(batch);
+                updateDisplayRegion.Close();
 
                 // Fire off the execution of OnAfterRenderAsync, but don't wait for it
                 // if there is async work to be done.
@@ -583,6 +586,8 @@ namespace Microsoft.AspNetCore.Components.RenderTree
 
         private void RenderInExistingBatch(RenderQueueEntry renderQueueEntry)
         {
+            var timingRegion = TimingRegion.Open($"{nameof(Renderer)}.{nameof(RenderInExistingBatch)}");
+
             var componentState = renderQueueEntry.ComponentState;
             Log.RenderingComponent(_logger, componentState);
             componentState.RenderIntoBatch(_batchBuilder, renderQueueEntry.RenderFragment);
@@ -612,6 +617,8 @@ namespace Microsoft.AspNetCore.Components.RenderTree
             {
                 HandleException(exceptions[0]);
             }
+
+            timingRegion.Close();
         }
 
         private void RemoveEventHandlerIds(ArrayRange<ulong> eventHandlerIds, Task afterTaskIgnoreErrors)

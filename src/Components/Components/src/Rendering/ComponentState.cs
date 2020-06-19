@@ -67,7 +67,10 @@ namespace Microsoft.AspNetCore.Components.Rendering
             (CurrentRenderTree, _renderTreeBuilderPrevious) = (_renderTreeBuilderPrevious, CurrentRenderTree);
 
             CurrentRenderTree.Clear();
+
+            var timingRegion = TimingRegion.Open($"{nameof(ComponentState)}.{nameof(RenderIntoBatch)} - invoke renderFragment");
             renderFragment(CurrentRenderTree);
+            timingRegion.Close();
 
             var diff = RenderTreeDiffBuilder.ComputeDiff(
                 _renderer,

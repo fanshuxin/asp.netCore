@@ -109,4 +109,29 @@ export class TimingRegion {
             Object.values(region.children).forEach(processRecursive);
         }
     }
+
+    public static fromDotNetTimingRegion(source: DotNetTimingRegion): TimingRegion {
+        const result = new TimingRegion(source.name);
+        result.totalCount = source.totalCount;
+        result.totalDuration = source.totalDuration;
+        result.children = {};
+        Object.values(source.children).forEach(sourceChild => {
+            result.children[sourceChild.name] = TimingRegion.fromDotNetTimingRegion(sourceChild);
+        });
+        return result;
+    }
+}
+
+// For logging .NET's TimingRegion
+window['timingRegion'] = {
+    logFromDotNet: function(region: DotNetTimingRegion) {
+        TimingRegion.fromDotNetTimingRegion(region).logAll();
+    }
+};
+
+interface DotNetTimingRegion {
+    name: string;
+    totalCount: number;
+    totalDuration: number;
+    children: { [name: string]: DotNetTimingRegion };
 }

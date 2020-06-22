@@ -1,7 +1,7 @@
 import { DotNet } from '@microsoft/dotnet-js-interop';
 import './GlobalExports';
 import * as Environment from './Environment';
-import { monoPlatform } from './Platform/Mono/MonoPlatform';
+import { monoPlatform, clearStringCache } from './Platform/Mono/MonoPlatform';
 import { renderBatch } from './Rendering/Renderer';
 import { SharedMemoryRenderBatch } from './Rendering/RenderBatch/SharedMemoryRenderBatch';
 import { shouldAutoStart } from './BootCommon';
@@ -36,7 +36,9 @@ async function boot(options?: Partial<WebAssemblyStartOptions>): Promise<void> {
   window['Blazor'].platform = platform;
   window['Blazor']._internal.renderBatch = (browserRendererId: number, batchAddress: Pointer) => {
     const timingRegion = TimingRegion.open('Blazor._internal.renderBatch');
+    clearStringCache();
     renderBatch(browserRendererId, new SharedMemoryRenderBatch(batchAddress));
+    clearStringCache();
     timingRegion.close();
   };
 

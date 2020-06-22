@@ -7,6 +7,11 @@ import { loadTimezoneData } from './TimezoneDataFile';
 import { WebAssemblyBootResourceType } from '../WebAssemblyStartOptions';
 import { TimingRegion } from '../../Services/TimingRegion';
 
+let currentStringCache = new Map<number, string | null>();
+export function clearStringCache() {
+  currentStringCache.clear();
+}
+
 let mono_string_get_utf8: (managedString: System_String) => Pointer;
 let mono_wasm_add_assembly: (name: string, heapAddress: number, length: number) => void;
 const appBinDirName = 'appBinDir';
@@ -120,8 +125,13 @@ export const monoPlatform: Platform = {
       return unboxedValue;
     }
 
+    if (currentStringCache.has(fieldValue)) {
+      return currentStringCache.get(fieldValue)!;
+    }
+
     const timingRegion = TimingRegion.open('MonoPlatform.readStringField');
     const result = BINDING.conv_string(fieldValue as any as System_String);
+    currentStringCache.set(fieldValue, result);
     timingRegion.close();
     return result;
   },

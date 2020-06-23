@@ -46,7 +46,7 @@ namespace Microsoft.AspNetCore.Components.Rendering
         /// <param name="elementName">A value representing the type of the element.</param>
         public void OpenElement(int sequence, string elementName)
         {
-            var timingRegion = TimingRegion.Impl.Open($"{nameof(RenderTreeBuilder)}.{nameof(OpenElement)}");
+            var timingRegion = TimingRegion.Open($"{nameof(RenderTreeBuilder)}.{nameof(OpenElement)}");
             // We are entering a new scope, since we track the "duplicate attributes" per
             // element/component we might need to clean them up now.
             if (_hasSeenAddMultipleAttributes)
@@ -57,7 +57,7 @@ namespace Microsoft.AspNetCore.Components.Rendering
 
             _openElementIndices.Push(_entries.Count);
             Append(RenderTreeFrame.Element(sequence, elementName));
-            TimingRegion.Impl.Close(timingRegion);
+            TimingRegion.Close(timingRegion);
         }
 
         /// <summary>
@@ -66,7 +66,7 @@ namespace Microsoft.AspNetCore.Components.Rendering
         /// </summary>
         public void CloseElement()
         {
-            var timingRegion = TimingRegion.Impl.Open($"{nameof(RenderTreeBuilder)}.{nameof(CloseElement)}");
+            var timingRegion = TimingRegion.Open($"{nameof(RenderTreeBuilder)}.{nameof(CloseElement)}");
             var indexOfEntryBeingClosed = _openElementIndices.Pop();
 
             // We might be closing an element with only attributes, run the duplicate cleanup pass
@@ -78,7 +78,7 @@ namespace Microsoft.AspNetCore.Components.Rendering
 
             ref var entry = ref _entries.Buffer[indexOfEntryBeingClosed];
             entry = entry.WithElementSubtreeLength(_entries.Count - indexOfEntryBeingClosed);
-            TimingRegion.Impl.Close(timingRegion);
+            TimingRegion.Close(timingRegion);
         }
 
         /// <summary>
@@ -88,12 +88,12 @@ namespace Microsoft.AspNetCore.Components.Rendering
         /// <param name="markupContent">Content for the new markup frame.</param>
         public void AddMarkupContent(int sequence, string markupContent)
         {
-            var timingRegion = TimingRegion.Impl.Open($"{nameof(RenderTreeBuilder)}.{nameof(AddMarkupContent)}");
+            var timingRegion = TimingRegion.Open($"{nameof(RenderTreeBuilder)}.{nameof(AddMarkupContent)}");
             if (!string.IsNullOrWhiteSpace(markupContent))
             {
                 Append(RenderTreeFrame.Markup(sequence, markupContent ?? string.Empty));
             }
-            TimingRegion.Impl.Close(timingRegion);
+            TimingRegion.Close(timingRegion);
         }
 
         /// <summary>
@@ -103,12 +103,12 @@ namespace Microsoft.AspNetCore.Components.Rendering
         /// <param name="textContent">Content for the new text frame.</param>
         public void AddContent(int sequence, string textContent)
         {
-            var timingRegion = TimingRegion.Impl.Open($"{nameof(RenderTreeBuilder)}.{nameof(AddContent)}(string)");
+            var timingRegion = TimingRegion.Open($"{nameof(RenderTreeBuilder)}.{nameof(AddContent)}(string)");
             if (!string.IsNullOrWhiteSpace(textContent))
             {
                 Append(RenderTreeFrame.Text(sequence, textContent ?? string.Empty));
             }
-            TimingRegion.Impl.Close(timingRegion);
+            TimingRegion.Close(timingRegion);
         }
 
         /// <summary>
@@ -118,7 +118,7 @@ namespace Microsoft.AspNetCore.Components.Rendering
         /// <param name="fragment">Content to append.</param>
         public void AddContent(int sequence, RenderFragment fragment)
         {
-            var timingRegion = TimingRegion.Impl.Open($"{nameof(RenderTreeBuilder)}.{nameof(AddContent)}(RenderFragment)");
+            var timingRegion = TimingRegion.Open($"{nameof(RenderTreeBuilder)}.{nameof(AddContent)}(RenderFragment)");
             if (fragment != null)
             {
                 // We surround the fragment with a region delimiter to indicate that the
@@ -129,7 +129,7 @@ namespace Microsoft.AspNetCore.Components.Rendering
                 fragment(this);
                 CloseRegion();
             }
-            TimingRegion.Impl.Close(timingRegion);
+            TimingRegion.Close(timingRegion);
         }
 
         /// <summary>
@@ -140,12 +140,12 @@ namespace Microsoft.AspNetCore.Components.Rendering
         /// <param name="value">The value used by <paramref name="fragment"/>.</param>
         public void AddContent<TValue>(int sequence, RenderFragment<TValue> fragment, TValue value)
         {
-            var timingRegion = TimingRegion.Impl.Open($"{nameof(RenderTreeBuilder)}.{nameof(AddContent)}<TValue>");
+            var timingRegion = TimingRegion.Open($"{nameof(RenderTreeBuilder)}.{nameof(AddContent)}<TValue>");
             if (fragment != null)
             {
                 AddContent(sequence, fragment(value));
             }
-            TimingRegion.Impl.Close(timingRegion);
+            TimingRegion.Close(timingRegion);
         }
 
         /// <summary>
@@ -178,7 +178,7 @@ namespace Microsoft.AspNetCore.Components.Rendering
         /// <param name="value">The value of the attribute.</param>
         public void AddAttribute(int sequence, string name, bool value)
         {
-            var timingRegion = TimingRegion.Impl.Open($"{nameof(RenderTreeBuilder)}.{nameof(AddAttribute)}(bool)");
+            var timingRegion = TimingRegion.Open($"{nameof(RenderTreeBuilder)}.{nameof(AddAttribute)}(bool)");
             AssertCanAddAttribute();
             if (_lastNonAttributeFrameType == RenderTreeFrameType.Component)
             {
@@ -194,7 +194,7 @@ namespace Microsoft.AspNetCore.Components.Rendering
             {
                 TrackAttributeName(name);
             }
-            TimingRegion.Impl.Close(timingRegion);
+            TimingRegion.Close(timingRegion);
         }
 
         /// <summary>
@@ -211,7 +211,7 @@ namespace Microsoft.AspNetCore.Components.Rendering
         /// <param name="value">The value of the attribute.</param>
         public void AddAttribute(int sequence, string name, string value)
         {
-            var timingRegion = TimingRegion.Impl.Open($"{nameof(RenderTreeBuilder)}.{nameof(AddAttribute)}(string)");
+            var timingRegion = TimingRegion.Open($"{nameof(RenderTreeBuilder)}.{nameof(AddAttribute)}(string)");
             AssertCanAddAttribute();
             if (value != null || _lastNonAttributeFrameType == RenderTreeFrameType.Component)
             {
@@ -221,7 +221,7 @@ namespace Microsoft.AspNetCore.Components.Rendering
             {
                 TrackAttributeName(name);
             }
-            TimingRegion.Impl.Close(timingRegion);
+            TimingRegion.Close(timingRegion);
         }
 
         /// <summary>
@@ -238,7 +238,7 @@ namespace Microsoft.AspNetCore.Components.Rendering
         /// <param name="value">The value of the attribute.</param>
         public void AddAttribute(int sequence, string name, MulticastDelegate value)
         {
-            var timingRegion = TimingRegion.Impl.Open($"{nameof(RenderTreeBuilder)}.{nameof(AddAttribute)}(MulticastDelegate)");
+            var timingRegion = TimingRegion.Open($"{nameof(RenderTreeBuilder)}.{nameof(AddAttribute)}(MulticastDelegate)");
             AssertCanAddAttribute();
             if (value != null || _lastNonAttributeFrameType == RenderTreeFrameType.Component)
             {
@@ -248,7 +248,7 @@ namespace Microsoft.AspNetCore.Components.Rendering
             {
                 TrackAttributeName(name);
             }
-            TimingRegion.Impl.Close(timingRegion);
+            TimingRegion.Close(timingRegion);
         }
 
         /// <summary>
@@ -269,7 +269,7 @@ namespace Microsoft.AspNetCore.Components.Rendering
         /// </remarks>
         public void AddAttribute(int sequence, string name, EventCallback value)
         {
-            var timingRegion = TimingRegion.Impl.Open($"{nameof(RenderTreeBuilder)}.{nameof(AddAttribute)}(EventCallback)");
+            var timingRegion = TimingRegion.Open($"{nameof(RenderTreeBuilder)}.{nameof(AddAttribute)}(EventCallback)");
             AssertCanAddAttribute();
             if (_lastNonAttributeFrameType == RenderTreeFrameType.Component)
             {
@@ -294,7 +294,7 @@ namespace Microsoft.AspNetCore.Components.Rendering
                 // Track the attribute name if needed since we elided the frame.
                 TrackAttributeName(name);
             }
-            TimingRegion.Impl.Close(timingRegion);
+            TimingRegion.Close(timingRegion);
         }
 
         /// <summary>
@@ -315,7 +315,7 @@ namespace Microsoft.AspNetCore.Components.Rendering
         /// </remarks>
         public void AddAttribute<TArgument>(int sequence, string name, EventCallback<TArgument> value)
         {
-            var timingRegion = TimingRegion.Impl.Open($"{nameof(RenderTreeBuilder)}.{nameof(AddAttribute)}(EventCallback<TArgument>)");
+            var timingRegion = TimingRegion.Open($"{nameof(RenderTreeBuilder)}.{nameof(AddAttribute)}(EventCallback<TArgument>)");
             AssertCanAddAttribute();
             if (_lastNonAttributeFrameType == RenderTreeFrameType.Component)
             {
@@ -340,7 +340,7 @@ namespace Microsoft.AspNetCore.Components.Rendering
                 // Track the attribute name if needed since we elided the frame.
                 TrackAttributeName(name);
             }
-            TimingRegion.Impl.Close(timingRegion);
+            TimingRegion.Close(timingRegion);
         }
 
         /// <summary>
@@ -354,7 +354,7 @@ namespace Microsoft.AspNetCore.Components.Rendering
         /// <param name="value">The value of the attribute.</param>
         public void AddAttribute(int sequence, string name, object value)
         {
-            var timingRegion = TimingRegion.Impl.Open($"{nameof(RenderTreeBuilder)}.{nameof(AddAttribute)}(object)");
+            var timingRegion = TimingRegion.Open($"{nameof(RenderTreeBuilder)}.{nameof(AddAttribute)}(object)");
             // This looks a bit daunting because we need to handle the boxed/object version of all of the
             // types that AddAttribute special cases.
             if (_lastNonAttributeFrameType == RenderTreeFrameType.Element)
@@ -407,7 +407,7 @@ namespace Microsoft.AspNetCore.Components.Rendering
                 // This is going to throw. Calling it just to get a consistent exception message.
                 AssertCanAddAttribute();
             }
-            TimingRegion.Impl.Close(timingRegion);
+            TimingRegion.Close(timingRegion);
         }
 
         /// <summary>
@@ -422,7 +422,7 @@ namespace Microsoft.AspNetCore.Components.Rendering
         /// <param name="frame">A <see cref="RenderTreeFrame"/> holding the name and value of the attribute.</param>
         public void AddAttribute(int sequence, in RenderTreeFrame frame)
         {
-            var timingRegion = TimingRegion.Impl.Open($"{nameof(RenderTreeBuilder)}.{nameof(AddAttribute)}(RenderTreeFrame)");
+            var timingRegion = TimingRegion.Open($"{nameof(RenderTreeBuilder)}.{nameof(AddAttribute)}(RenderTreeFrame)");
             if (frame.FrameType != RenderTreeFrameType.Attribute)
             {
                 throw new ArgumentException($"The {nameof(frame.FrameType)} must be {RenderTreeFrameType.Attribute}.");
@@ -430,7 +430,7 @@ namespace Microsoft.AspNetCore.Components.Rendering
 
             AssertCanAddAttribute();
             Append(frame.WithAttributeSequence(sequence));
-            TimingRegion.Impl.Close(timingRegion);
+            TimingRegion.Close(timingRegion);
         }
 
         /// <summary>
@@ -440,7 +440,7 @@ namespace Microsoft.AspNetCore.Components.Rendering
         /// <param name="attributes">A collection of key-value pairs representing attributes.</param>
         public void AddMultipleAttributes(int sequence, IEnumerable<KeyValuePair<string, object>> attributes)
         {
-            var timingRegion = TimingRegion.Impl.Open($"{nameof(RenderTreeBuilder)}.{nameof(AddMultipleAttributes)}");
+            var timingRegion = TimingRegion.Open($"{nameof(RenderTreeBuilder)}.{nameof(AddMultipleAttributes)}");
             // Calling this up-front just to make sure we validate before mutating anything.
             AssertCanAddAttribute();
 
@@ -457,7 +457,7 @@ namespace Microsoft.AspNetCore.Components.Rendering
                     AddAttribute(sequence, attribute.Key, attribute.Value);
                 }
             }
-            TimingRegion.Impl.Close(timingRegion);
+            TimingRegion.Close(timingRegion);
         }
 
         /// <summary>
@@ -474,7 +474,7 @@ namespace Microsoft.AspNetCore.Components.Rendering
         /// <param name="updatesAttributeName">The name of another attribute whose value can be updated when the event handler is executed.</param>
         public void SetUpdatesAttributeName(string updatesAttributeName)
         {
-            var timingRegion = TimingRegion.Impl.Open($"{nameof(RenderTreeBuilder)}.{nameof(SetUpdatesAttributeName)}");
+            var timingRegion = TimingRegion.Open($"{nameof(RenderTreeBuilder)}.{nameof(SetUpdatesAttributeName)}");
             if (_entries.Count == 0)
             {
                 throw new InvalidOperationException("No preceding attribute frame exists.");
@@ -487,7 +487,7 @@ namespace Microsoft.AspNetCore.Components.Rendering
             }
 
             prevFrame = prevFrame.WithAttributeEventUpdatesAttributeName(updatesAttributeName);
-            TimingRegion.Impl.Close(timingRegion);
+            TimingRegion.Close(timingRegion);
         }
 
         /// <summary>
@@ -519,12 +519,12 @@ namespace Microsoft.AspNetCore.Components.Rendering
         /// <param name="value">The value for the key.</param>
         public void SetKey(object value)
         {
-            var timingRegion = TimingRegion.Impl.Open($"{nameof(RenderTreeBuilder)}.{nameof(SetKey)}");
+            var timingRegion = TimingRegion.Open($"{nameof(RenderTreeBuilder)}.{nameof(SetKey)}");
             if (value == null)
             {
                 // Null is equivalent to not having set a key, which is valuable because Razor syntax doesn't have an
                 // easy way to have conditional directive attributes
-                TimingRegion.Impl.Close(timingRegion);
+                TimingRegion.Close(timingRegion);
                 return;
             }
 
@@ -547,12 +547,12 @@ namespace Microsoft.AspNetCore.Components.Rendering
                 default:
                     throw new InvalidOperationException($"Cannot set a key on a frame of type {parentFrame.FrameType}.");
             }
-            TimingRegion.Impl.Close(timingRegion);
+            TimingRegion.Close(timingRegion);
         }
 
         private void OpenComponentUnchecked(int sequence, Type componentType)
         {
-            var timingRegion = TimingRegion.Impl.Open($"{nameof(RenderTreeBuilder)}.{nameof(OpenComponentUnchecked)}");
+            var timingRegion = TimingRegion.Open($"{nameof(RenderTreeBuilder)}.{nameof(OpenComponentUnchecked)}");
             // We are entering a new scope, since we track the "duplicate attributes" per
             // element/component we might need to clean them up now.
             if (_hasSeenAddMultipleAttributes)
@@ -563,7 +563,7 @@ namespace Microsoft.AspNetCore.Components.Rendering
 
             _openElementIndices.Push(_entries.Count);
             Append(RenderTreeFrame.ChildComponent(sequence, componentType));
-            TimingRegion.Impl.Close(timingRegion);
+            TimingRegion.Close(timingRegion);
         }
 
         /// <summary>
@@ -572,7 +572,7 @@ namespace Microsoft.AspNetCore.Components.Rendering
         /// </summary>
         public void CloseComponent()
         {
-            var timingRegion = TimingRegion.Impl.Open($"{nameof(RenderTreeBuilder)}.{nameof(CloseComponent)}");
+            var timingRegion = TimingRegion.Open($"{nameof(RenderTreeBuilder)}.{nameof(CloseComponent)}");
             var indexOfEntryBeingClosed = _openElementIndices.Pop();
 
             // We might be closing a component with only attributes. Run the attribute cleanup pass
@@ -584,7 +584,7 @@ namespace Microsoft.AspNetCore.Components.Rendering
 
             ref var entry = ref _entries.Buffer[indexOfEntryBeingClosed];
             entry = entry.WithComponentSubtreeLength(_entries.Count - indexOfEntryBeingClosed);
-            TimingRegion.Impl.Close(timingRegion);
+            TimingRegion.Close(timingRegion);
         }
 
         /// <summary>
@@ -594,14 +594,14 @@ namespace Microsoft.AspNetCore.Components.Rendering
         /// <param name="elementReferenceCaptureAction">An action to be invoked whenever the reference value changes.</param>
         public void AddElementReferenceCapture(int sequence, Action<ElementReference> elementReferenceCaptureAction)
         {
-            var timingRegion = TimingRegion.Impl.Open($"{nameof(RenderTreeBuilder)}.{nameof(AddElementReferenceCapture)}");
+            var timingRegion = TimingRegion.Open($"{nameof(RenderTreeBuilder)}.{nameof(AddElementReferenceCapture)}");
             if (GetCurrentParentFrameType() != RenderTreeFrameType.Element)
             {
                 throw new InvalidOperationException($"Element reference captures may only be added as children of frames of type {RenderTreeFrameType.Element}");
             }
 
             Append(RenderTreeFrame.ElementReferenceCapture(sequence, elementReferenceCaptureAction));
-            TimingRegion.Impl.Close(timingRegion);
+            TimingRegion.Close(timingRegion);
         }
 
         /// <summary>
@@ -611,7 +611,7 @@ namespace Microsoft.AspNetCore.Components.Rendering
         /// <param name="componentReferenceCaptureAction">An action to be invoked whenever the reference value changes.</param>
         public void AddComponentReferenceCapture(int sequence, Action<object> componentReferenceCaptureAction)
         {
-            var timingRegion = TimingRegion.Impl.Open($"{nameof(RenderTreeBuilder)}.{nameof(AddComponentReferenceCapture)}");
+            var timingRegion = TimingRegion.Open($"{nameof(RenderTreeBuilder)}.{nameof(AddComponentReferenceCapture)}");
             var parentFrameIndex = GetCurrentParentFrameIndex();
             if (!parentFrameIndex.HasValue)
             {
@@ -625,7 +625,7 @@ namespace Microsoft.AspNetCore.Components.Rendering
             }
 
             Append(RenderTreeFrame.ComponentReferenceCapture(sequence, componentReferenceCaptureAction, parentFrameIndexValue));
-            TimingRegion.Impl.Close(timingRegion);
+            TimingRegion.Close(timingRegion);
         }
 
         /// <summary>
@@ -634,7 +634,7 @@ namespace Microsoft.AspNetCore.Components.Rendering
         /// <param name="sequence">An integer that represents the position of the instruction in the source code.</param>
         public void OpenRegion(int sequence)
         {
-            var timingRegion = TimingRegion.Impl.Open($"{nameof(RenderTreeBuilder)}.{nameof(OpenRegion)}");
+            var timingRegion = TimingRegion.Open($"{nameof(RenderTreeBuilder)}.{nameof(OpenRegion)}");
             // We are entering a new scope, since we track the "duplicate attributes" per
             // element/component we might need to clean them up now.
             if (_hasSeenAddMultipleAttributes)
@@ -645,7 +645,7 @@ namespace Microsoft.AspNetCore.Components.Rendering
 
             _openElementIndices.Push(_entries.Count);
             Append(RenderTreeFrame.Region(sequence));
-            TimingRegion.Impl.Close(timingRegion);
+            TimingRegion.Close(timingRegion);
         }
 
         /// <summary>
@@ -654,11 +654,11 @@ namespace Microsoft.AspNetCore.Components.Rendering
         /// </summary>
         public void CloseRegion()
         {
-            var timingRegion = TimingRegion.Impl.Open($"{nameof(RenderTreeBuilder)}.{nameof(CloseRegion)}");
+            var timingRegion = TimingRegion.Open($"{nameof(RenderTreeBuilder)}.{nameof(CloseRegion)}");
             var indexOfEntryBeingClosed = _openElementIndices.Pop();
             ref var entry = ref _entries.Buffer[indexOfEntryBeingClosed];
             entry = entry.WithRegionSubtreeLength(_entries.Count - indexOfEntryBeingClosed);
-            TimingRegion.Impl.Close(timingRegion);
+            TimingRegion.Close(timingRegion);
         }
 
         private void AssertCanAddAttribute()
@@ -697,16 +697,16 @@ namespace Microsoft.AspNetCore.Components.Rendering
         // It's expensive because it involves copying all the subsequent memory in the array
         internal void InsertAttributeExpensive(int insertAtIndex, int sequence, string attributeName, object attributeValue)
         {
-            var timingRegion = TimingRegion.Impl.Open($"{nameof(RenderTreeBuilder)}.{nameof(InsertAttributeExpensive)}");
+            var timingRegion = TimingRegion.Open($"{nameof(RenderTreeBuilder)}.{nameof(InsertAttributeExpensive)}");
             // Replicate the same attribute omission logic as used elsewhere
             if ((attributeValue == null) || (attributeValue is bool boolValue && !boolValue))
             {
-                TimingRegion.Impl.Close(timingRegion);
+                TimingRegion.Close(timingRegion);
                 return;
             }
 
             _entries.InsertExpensive(insertAtIndex, RenderTreeFrame.Attribute(sequence, attributeName, attributeValue));
-            TimingRegion.Impl.Close(timingRegion);
+            TimingRegion.Close(timingRegion);
         }
 
         /// <summary>
@@ -730,7 +730,7 @@ namespace Microsoft.AspNetCore.Components.Rendering
         // Internal for testing
         internal void ProcessDuplicateAttributes(int first)
         {
-            var timingRegion = TimingRegion.Impl.Open($"{nameof(RenderTreeBuilder)}.{nameof(ProcessDuplicateAttributes)}");
+            var timingRegion = TimingRegion.Open($"{nameof(RenderTreeBuilder)}.{nameof(ProcessDuplicateAttributes)}");
             Debug.Assert(_hasSeenAddMultipleAttributes);
 
             // When AddMultipleAttributes method has been called, we need to postprocess attributes while closing
@@ -749,7 +749,7 @@ namespace Microsoft.AspNetCore.Components.Rendering
             }
 
             // Now that we've found the last attribute, we can iterate backwards and process duplicates.
-            var buildSeenAttributeNamesDictRegion = TimingRegion.Impl.Open($"{nameof(RenderTreeBuilder)}.{nameof(ProcessDuplicateAttributes)} - build seenAttributeNames");
+            var buildSeenAttributeNamesDictRegion = TimingRegion.Open($"{nameof(RenderTreeBuilder)}.{nameof(ProcessDuplicateAttributes)} - build seenAttributeNames");
             var seenAttributeNames = (_seenAttributeNames ??= new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase));
             for (var i = last; i >= first; i--)
             {
@@ -787,7 +787,7 @@ namespace Microsoft.AspNetCore.Components.Rendering
                     // That gets you here, and there's no action to take.
                 }
             }
-            TimingRegion.Impl.Close(buildSeenAttributeNamesDictRegion);
+            TimingRegion.Close(buildSeenAttributeNamesDictRegion);
 
             // This is the pass where we cleanup attributes that have been wiped out.
             //
@@ -814,22 +814,22 @@ namespace Microsoft.AspNetCore.Components.Rendering
 
             seenAttributeNames.Clear();
             _hasSeenAddMultipleAttributes = false;
-            TimingRegion.Impl.Close(timingRegion);
+            TimingRegion.Close(timingRegion);
         }
 
         // Internal for testing
         internal void TrackAttributeName(string name)
         {
-            var timingRegion = TimingRegion.Impl.Open($"{nameof(RenderTreeBuilder)}.{nameof(TrackAttributeName)}");
+            var timingRegion = TimingRegion.Open($"{nameof(RenderTreeBuilder)}.{nameof(TrackAttributeName)}");
             if (!_hasSeenAddMultipleAttributes)
             {
-                TimingRegion.Impl.Close(timingRegion);
+                TimingRegion.Close(timingRegion);
                 return;
             }
 
             var seenAttributeNames = (_seenAttributeNames ??= new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase));
             seenAttributeNames[name] = _entries.Count; // See comment in ProcessAttributes for why this is OK.
-            TimingRegion.Impl.Close(timingRegion);
+            TimingRegion.Close(timingRegion);
         }
 
         void IDisposable.Dispose()

@@ -1,28 +1,15 @@
-﻿@typeparam TRowData
+@typeparam TRowData
 
 <CascadingValue IsFixed="true" Value="this">@ChildContent</CascadingValue>
 
-<table @attributes="@Attributes">
-    <thead>
-        <tr>
-            @foreach (var col in columns)
+<table @attributes="@Attributes"><thead><tr>@foreach (var col in columns)
             {
                 col.RenderHeader(__builder);
-            }
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Data)
-        {
-            <tr @key="item.GetHashCode()" class="@(RowClass?.Invoke(item))">
-                @foreach (var col in columns)
+            }</tr></thead><tbody>@foreach (var item in Data)
+        {<tr @key="item.GetHashCode()" class="@(RowClass?.Invoke(item))">@foreach (var col in columns)
                 {
                     col.RenderCell(__builder, item);
-                }
-            </tr>
-        }
-    </tbody>
-</table>
+                }</tr>}</tbody></table>
 
 @code {
     [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object> Attributes { get; set; }

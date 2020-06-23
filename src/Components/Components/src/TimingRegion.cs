@@ -5,14 +5,14 @@ namespace Microsoft.AspNetCore.Components
 {
     public static class TimingRegion
     {
-        public static int Open(string name)
+        public static void Open(string name)
         {
-            return InternalCalls.InvokeJSUnmarshalled<string, object, object, int>(out _, "timingRegion.open", name, default!, default!);
+            InternalCalls.InvokeJSUnmarshalled<string, object, object, int>(out _, "timingRegion.open", name, default!, default!);
         }
 
-        public static void Close(int id)
+        public static void Close(string name)
         {
-            InternalCalls.InvokeJSUnmarshalled<int, object, object, object>(out _, "timingRegion.close", id, default!, default!);
+            InternalCalls.InvokeJSUnmarshalled<string, object, object, object>(out _, "timingRegion.close", name, default!, default!);
         }
     }
 }

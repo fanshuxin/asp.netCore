@@ -25,7 +25,7 @@ namespace Microsoft.AspNetCore.Components.RenderTree
             ArrayRange<RenderTreeFrame> oldTree,
             ArrayRange<RenderTreeFrame> newTree)
         {
-            var timingRegion = TimingRegion.Open($"{nameof(RenderTreeDiffBuilder)}.{nameof(ComputeDiff)}");
+            TimingRegion.Open($"{nameof(RenderTreeDiffBuilder)}.{nameof(ComputeDiff)}");
             var editsBuffer = batchBuilder.EditsBuffer;
             var editsBufferStartLength = editsBuffer.Count;
 
@@ -34,7 +34,7 @@ namespace Microsoft.AspNetCore.Components.RenderTree
 
             var editsSegment = editsBuffer.ToSegment(editsBufferStartLength, editsBuffer.Count);
             var result = new RenderTreeDiff(componentId, editsSegment);
-            TimingRegion.Close(timingRegion);
+            TimingRegion.Close($"{nameof(RenderTreeDiffBuilder)}.{nameof(ComputeDiff)}");
             return result;
         }
 

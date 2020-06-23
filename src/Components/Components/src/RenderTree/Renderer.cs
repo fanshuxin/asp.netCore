@@ -236,9 +236,9 @@ namespace Microsoft.AspNetCore.Components.RenderTree
                 // all in a single batch.
                 _isBatchInProgress = true;
 
-                var timingRegion = TimingRegion.Open($"{nameof(Renderer)}.{nameof(DispatchEventAsync)} - invoke callback");
+                TimingRegion.Open($"{nameof(Renderer)}.{nameof(DispatchEventAsync)} - invoke callback");
                 task = callback.InvokeAsync(eventArgs);
-                TimingRegion.Close(timingRegion);
+                TimingRegion.Close($"{nameof(Renderer)}.{nameof(DispatchEventAsync)} - invoke callback");
             }
             catch (Exception e)
             {
@@ -406,7 +406,7 @@ namespace Microsoft.AspNetCore.Components.RenderTree
 
         private void ProcessRenderQueue()
         {
-            var timingRegion = TimingRegion.Open($"{nameof(Renderer)}.{nameof(ProcessRenderQueue)}");
+            TimingRegion.Open($"{nameof(Renderer)}.{nameof(ProcessRenderQueue)}");
             Dispatcher.AssertAccess();
 
             if (_isBatchInProgress)
@@ -433,9 +433,9 @@ namespace Microsoft.AspNetCore.Components.RenderTree
 
                 var batch = _batchBuilder.ToBatch();
 
-                var updateDisplayRegion = TimingRegion.Open($"{nameof(Renderer)}.{nameof(ProcessRenderQueue)} - call UpdateDisplayAsync");
+                TimingRegion.Open($"{nameof(Renderer)}.{nameof(ProcessRenderQueue)} - call UpdateDisplayAsync");
                 updateDisplayTask = UpdateDisplayAsync(batch);
-                TimingRegion.Close(updateDisplayRegion);
+                TimingRegion.Close($"{nameof(Renderer)}.{nameof(ProcessRenderQueue)} - call UpdateDisplayAsync");
 
                 // Fire off the execution of OnAfterRenderAsync, but don't wait for it
                 // if there is async work to be done.
@@ -452,7 +452,7 @@ namespace Microsoft.AspNetCore.Components.RenderTree
                 RemoveEventHandlerIds(_batchBuilder.DisposedEventHandlerIds.ToRange(), updateDisplayTask);
                 _batchBuilder.ClearStateForCurrentBatch();
                 _isBatchInProgress = false;
-                TimingRegion.Close(timingRegion);
+                TimingRegion.Close($"{nameof(Renderer)}.{nameof(ProcessRenderQueue)}");
             }
 
             // An OnAfterRenderAsync callback might have queued more work synchronously.
@@ -586,7 +586,7 @@ namespace Microsoft.AspNetCore.Components.RenderTree
 
         private void RenderInExistingBatch(RenderQueueEntry renderQueueEntry)
         {
-            var timingRegion = TimingRegion.Open($"{nameof(Renderer)}.{nameof(RenderInExistingBatch)}");
+            TimingRegion.Open($"{nameof(Renderer)}.{nameof(RenderInExistingBatch)}");
 
             var componentState = renderQueueEntry.ComponentState;
             Log.RenderingComponent(_logger, componentState);
@@ -618,7 +618,7 @@ namespace Microsoft.AspNetCore.Components.RenderTree
                 HandleException(exceptions[0]);
             }
 
-            TimingRegion.Close(timingRegion);
+            TimingRegion.Close($"{nameof(Renderer)}.{nameof(RenderInExistingBatch)}");
         }
 
         private void RemoveEventHandlerIds(ArrayRange<ulong> eventHandlerIds, Task afterTaskIgnoreErrors)

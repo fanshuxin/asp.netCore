@@ -33,14 +33,14 @@ namespace Microsoft.AspNetCore.Components.WebAssembly.Infrastructure
         [JSInvokable(nameof(DispatchEvent))]
         public static Task DispatchEvent(WebEventDescriptor eventDescriptor, string eventArgsJson)
         {
-            var timingRegion = TimingRegion.Open($"{nameof(JSInteropMethods)}.{nameof(DispatchEvent)}");
+            TimingRegion.Open($"{nameof(JSInteropMethods)}.{nameof(DispatchEvent)}");
             var webEvent = WebEventData.Parse(eventDescriptor, eventArgsJson);
             var renderer = RendererRegistry.Find(eventDescriptor.BrowserRendererId);
             var resultTask = renderer.DispatchEventAsync(
                 webEvent.EventHandlerId,
                 webEvent.EventFieldInfo,
                 webEvent.EventArgs);
-            TimingRegion.Close(timingRegion);
+            TimingRegion.Close($"{nameof(JSInteropMethods)}.{nameof(DispatchEvent)}");
             return resultTask;
         }
     }

@@ -38,7 +38,18 @@ export class TimingRegion {
         }
     }
 
-    public close() {
+    static closeByName(name: string) {
+        const peekedInstance = TimingRegion.currentRegionsStack[TimingRegion.currentRegionsStack.length - 1];
+        if (!peekedInstance) {
+            throw new Error(`Timing region disposal mismatch. When trying to close ${name}, stack was empty.`);
+        } else if (peekedInstance.name !== name) {
+            throw new Error(`Timing region disposal mismatch. When trying to close ${name}, actually found ${peekedInstance.name}`);
+        }
+
+        peekedInstance.close();
+    }
+
+    close() {
         const endTime = performance.now();
         if (!this.currentlyActiveStartTime) {
             throw new Error(`Trying to stop timing region ${this.name} when it is not running.`);
@@ -116,9 +127,7 @@ export class TimingRegion {
 }
 
 // For logging .NET's TimingRegion
-const dotnetTimingRegionHandles = new Map<number, TimingRegion>();
 const cachedTimingRegionNames = new Map<System_String, string>();
-let nextDotnetTimingRegionHandleId = 1;
 
 window['timingRegion'] = {
     open: function(name: System_String) {
@@ -130,18 +139,10 @@ window['timingRegion'] = {
         }
 
         const nameAsJsString = cachedTimingRegionNames.get(name)!;
-        const region = TimingRegion.open(nameAsJsString);
-        const thisRegionId = nextDotnetTimingRegionHandleId++;
-        dotnetTimingRegionHandles.set(thisRegionId, region);
-        return thisRegionId;
+        TimingRegion.open(nameAsJsString);
     },
-    close: function(id: number) {
-        const region = dotnetTimingRegionHandles.get(id);
-        if (!region) {
-            throw new Error(`No such timing region: ${id}`);
-        }
-        dotnetTimingRegionHandles.delete(id);
-
-        region.close();
+    close: function(name: System_String) {
+        const nameAsJsString = cachedTimingRegionNames.get(name)!;
+        TimingRegion.closeByName(nameAsJsString);
     }
 };

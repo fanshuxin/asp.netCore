@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using WebAssembly.JSInterop;
 
@@ -5,11 +6,13 @@ namespace Microsoft.AspNetCore.Components
 {
     public static class TimingRegion
     {
+        //[Conditional("Ignore")]
         public static void Open(string name)
         {
             InternalCalls.InvokeJSUnmarshalled<string, object, object, int>(out _, "timingRegion.open", name, default!, default!);
         }
 
+        //[Conditional("Ignore")]
         public static void Close(string name)
         {
             InternalCalls.InvokeJSUnmarshalled<string, object, object, object>(out _, "timingRegion.close", name, default!, default!);

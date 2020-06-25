@@ -17,18 +17,16 @@ namespace Microsoft.AspNetCore.Components.Server.Circuits
         private readonly ILogger<RemoteJSRuntime> _logger;
         private CircuitClientProxy _clientProxy;
 
-        // Oh noes, circular DI dependency
-        // IJSRuntime -> IElementReferenceContextProvider -> IJSRuntime
-        // More tedious indirection needed
-        public RemoteJSRuntime(IOptions<CircuitOptions> options, ILogger<RemoteJSRuntime> logger, IElementReferenceContextProvider elementReferenceContextProvider)
+        public RemoteJSRuntime(IOptions<CircuitOptions> options, ILogger<RemoteJSRuntime> logger)
         {
             _options = options.Value;
             _logger = logger;
             DefaultAsyncTimeout = _options.JSInteropDefaultCallTimeout;
-
-            var elementReferenceContext = elementReferenceContextProvider.CreateElementReferenceContext();
-            JsonSerializerOptions.Converters.Add(new ElementReferenceJsonConverter(elementReferenceContext));
+            ElementReferenceContext = new WebElementReferenceContext(this);
+            JsonSerializerOptions.Converters.Add(new ElementReferenceJsonConverter(ElementReferenceContext));
         }
+
+        public ElementReferenceContext ElementReferenceContext { get; }
 
         internal void Initialize(CircuitClientProxy clientProxy)
         {

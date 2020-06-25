@@ -194,7 +194,6 @@ namespace Microsoft.AspNetCore.Components.WebAssembly.Hosting
             Services.AddLogging(builder => {
                 builder.AddProvider(new WebAssemblyConsoleLoggerProvider(DefaultWebAssemblyJSRuntime.Instance));
             });
-            Services.AddWebElementReferenceContext();
         }
     }
 }

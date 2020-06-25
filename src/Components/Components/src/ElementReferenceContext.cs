@@ -3,8 +3,7 @@
 
 namespace Microsoft.AspNetCore.Components
 {
-    public interface IElementReferenceContextProvider
+    public class ElementReferenceContext
     {
-        object CreateElementReferenceContext();
     }
 }

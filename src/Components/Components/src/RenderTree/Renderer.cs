@@ -70,9 +70,6 @@ namespace Microsoft.AspNetCore.Components.RenderTree
 
             _serviceProvider = serviceProvider;
             _logger = loggerFactory.CreateLogger<Renderer>();
-
-            var elementReferenceContextProvider = serviceProvider.GetService<IElementReferenceContextProvider>();
-            ElementReferenceContext = elementReferenceContextProvider?.CreateElementReferenceContext();
         }
 
         /// <summary>
@@ -81,9 +78,9 @@ namespace Microsoft.AspNetCore.Components.RenderTree
         public abstract Dispatcher Dispatcher { get; }
 
         /// <summary>
-        /// Gets the element reference context associated with this <see cref="Renderer"/>, or null is there isn't one.
+        /// Gets or sets the element reference context associated with this <see cref="Renderer"/>, if any.
         /// </summary>
-        public object? ElementReferenceContext { get; }
+        public ElementReferenceContext? ElementReferenceContext { get; protected set; }
 
         /// <summary>
         /// Constructs a new component of the specified type.

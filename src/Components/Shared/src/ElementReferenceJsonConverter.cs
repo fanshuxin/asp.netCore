@@ -10,11 +10,11 @@ namespace Microsoft.AspNetCore.Components
     internal sealed class ElementReferenceJsonConverter : JsonConverter<ElementReference>
     {
         private static readonly JsonEncodedText IdProperty = JsonEncodedText.Encode("__internalId");
-        private readonly object _elementReferenceContext;
+        private readonly ElementReferenceContext _elementReferenceContext;
 
-        public ElementReferenceJsonConverter(object elementReferenceContext)
+        public ElementReferenceJsonConverter(ElementReferenceContext elementReferenceContext)
         {
-            _elementReferenceContext = elementReferenceContext ?? throw new ArgumentNullException(nameof(elementReferenceContext));
+            _elementReferenceContext = elementReferenceContext;
         }
 
         public override ElementReference Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)

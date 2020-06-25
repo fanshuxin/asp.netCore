@@ -23,13 +23,16 @@ namespace Microsoft.AspNetCore.Components
         /// </remarks>
         public string Id { get; }
 
-        public ElementReference(string id)
+        public object Context { get; }
+
+        public ElementReference(string id, object context)
         {
             Id = id;
+            Context = context;
         }
 
-        internal static ElementReference CreateWithUniqueId()
-            => new ElementReference(CreateUniqueId());
+        internal static ElementReference CreateWithUniqueId(object context)
+            => new ElementReference(CreateUniqueId(), context);
 
         private static string CreateUniqueId()
         {

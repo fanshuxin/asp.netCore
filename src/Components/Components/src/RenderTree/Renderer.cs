@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components.Rendering;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Microsoft.AspNetCore.Components.RenderTree
@@ -69,12 +70,20 @@ namespace Microsoft.AspNetCore.Components.RenderTree
 
             _serviceProvider = serviceProvider;
             _logger = loggerFactory.CreateLogger<Renderer>();
+
+            var elementReferenceContextProvider = serviceProvider.GetService<IElementReferenceContextProvider>();
+            ElementReferenceContext = elementReferenceContextProvider?.CreateElementReferenceContext();
         }
 
         /// <summary>
         /// Gets the <see cref="Microsoft.AspNetCore.Components.Dispatcher" /> associated with this <see cref="Renderer" />.
         /// </summary>
         public abstract Dispatcher Dispatcher { get; }
+
+        /// <summary>
+        /// Gets the element reference context associated with this <see cref="Renderer"/>, or null is there isn't one.
+        /// </summary>
+        public object? ElementReferenceContext { get; }
 
         /// <summary>
         /// Constructs a new component of the specified type.

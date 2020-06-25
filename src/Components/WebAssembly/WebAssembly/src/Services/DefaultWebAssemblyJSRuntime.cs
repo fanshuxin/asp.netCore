@@ -8,11 +8,14 @@ namespace Microsoft.AspNetCore.Components.WebAssembly.Services
 {
     internal sealed class DefaultWebAssemblyJSRuntime : WebAssemblyJSRuntime
     {
+        // Oh no, this IJSRuntime isn't a DI service so can't depend on a DI service
+        // We'd have to change the logic that adds to JsonSerializerOptions.Converters
+        // so that it happens later in the startup process.
         internal static readonly DefaultWebAssemblyJSRuntime Instance = new DefaultWebAssemblyJSRuntime();
 
-        private DefaultWebAssemblyJSRuntime()
+        private DefaultWebAssemblyJSRuntime(object elementReferenceContext)
         {
-            JsonSerializerOptions.Converters.Add(new ElementReferenceJsonConverter());
+            JsonSerializerOptions.Converters.Add(new ElementReferenceJsonConverter(elementReferenceContext));
         }
 
         #pragma warning disable IDE0051 // Remove unused private members. Invoked via Mono's JS interop mechanism (invoke_method)

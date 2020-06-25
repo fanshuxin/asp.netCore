@@ -10,6 +10,12 @@ namespace Microsoft.AspNetCore.Components
     internal sealed class ElementReferenceJsonConverter : JsonConverter<ElementReference>
     {
         private static readonly JsonEncodedText IdProperty = JsonEncodedText.Encode("__internalId");
+        private readonly object _elementReferenceContext;
+
+        public ElementReferenceJsonConverter(object elementReferenceContext)
+        {
+            _elementReferenceContext = elementReferenceContext ?? throw new ArgumentNullException(nameof(elementReferenceContext));
+        }
 
         public override ElementReference Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
@@ -39,7 +45,7 @@ namespace Microsoft.AspNetCore.Components
                 throw new JsonException("__internalId is required.");
             }
 
-            return new ElementReference(id);
+            return new ElementReference(id, _elementReferenceContext);
         }
 
         public override void Write(Utf8JsonWriter writer, ElementReference value, JsonSerializerOptions options)

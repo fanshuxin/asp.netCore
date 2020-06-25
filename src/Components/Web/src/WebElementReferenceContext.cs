@@ -5,7 +5,7 @@ namespace Microsoft.AspNetCore.Components
 {
     public class WebElementReferenceContext : ElementReferenceContext
     {
-        public IJSRuntime JSRuntime { get; }
+        internal IJSRuntime JSRuntime { get; }
 
         public WebElementReferenceContext(IJSRuntime jsRuntime)
         {

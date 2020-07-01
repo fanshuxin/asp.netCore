@@ -1,6 +1,5 @@
 @echo off
-REM Need delayed expansion !PATH! so parens in the path don't mess up the parens for the if statements that use parens for blocks
-setlocal enabledelayedexpansion
+setlocal
 
 REM Use '$' as a variable name prefix to avoid MSBuild variable collisions with these variables
 set $target=%1
@@ -22,7 +21,8 @@ set DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
 set DOTNET_MULTILEVEL_LOOKUP=0
 set DOTNET_CLI_HOME=%HELIX_CORRELATION_PAYLOAD%\home
 
-set PATH=%DOTNET_ROOT%;!PATH!;%HELIX_CORRELATION_PAYLOAD%\node\bin
+echo Path now: %PATH%
+set PATH=%DOTNET_ROOT%;%PATH%;%HELIX_CORRELATION_PAYLOAD%\node\bin
 echo Set path to: %PATH%
 echo "Invoking InstallDotNet.ps1 %$arch% %$sdkVersion% %$runtimeVersion% %DOTNET_ROOT%"
 powershell.exe -NoProfile -ExecutionPolicy unrestricted -file InstallDotNet.ps1 %$arch% %$sdkVersion% %$runtimeVersion% %DOTNET_ROOT%

@@ -1,12 +1,10 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
-using System;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using FormatterWebSite.Controllers;
 using Microsoft.AspNetCore.Hosting;
@@ -113,6 +111,23 @@ namespace Microsoft.AspNetCore.Mvc.FunctionalTests
             // Act
             var response = await Client.PostAsJsonAsync("http://localhost/JsonFormatter/RoundtripSimpleModel/", expected);
             var actual = await response.Content.ReadAsAsync<JsonFormatterController.SimpleModel>();
+
+            // Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal(expected.Id, actual.Id);
+            Assert.Equal(expected.Name, actual.Name);
+            Assert.Equal(expected.StreetName, actual.StreetName);
+        }
+
+        [Fact]
+        public virtual async Task JsonInputFormatter_RoundtripsRecordModel()
+        {
+            // Arrange
+            var expected = new JsonFormatterController.SimpleRecordModel(18, "James", "JnK");
+
+            // Act
+            var response = await Client.PostAsJsonAsync("http://localhost/JsonFormatter/RoundtripRecordType/", expected);
+            var actual = await response.Content.ReadAsAsync<JsonFormatterController.SimpleRecordModel>();
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);

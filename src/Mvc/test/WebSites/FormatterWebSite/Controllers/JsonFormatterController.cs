@@ -71,6 +71,12 @@ namespace FormatterWebSite.Controllers
             return model;
         }
 
+        [HttpPost]
+        public ActionResult<SimpleRecordModel> RoundtripRecordType([FromBody] SimpleRecordModel model)
+        {
+            return model;
+        }
+
         public class SimpleModel
         {
             public int Id { get; set; }
@@ -79,5 +85,7 @@ namespace FormatterWebSite.Controllers
 
             public string StreetName { get; set; }
         }
+
+        public record SimpleRecordModel(int Id, string Name, string StreetName);
     }
 }

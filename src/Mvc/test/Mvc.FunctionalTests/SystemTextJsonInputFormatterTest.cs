@@ -13,13 +13,8 @@ namespace Microsoft.AspNetCore.Mvc.FunctionalTests
         {
         }
 
-        [Theory(Skip = "https://github.com/dotnet/corefx/issues/36025")]
-        [InlineData("\"I'm a JSON string!\"")]
-        [InlineData("true")]
-        [InlineData("\"\"")] // Empty string
-        public override Task JsonInputFormatter_ReturnsDefaultValue_ForValueTypes(string input)
-        {
-            return base.JsonInputFormatter_ReturnsDefaultValue_ForValueTypes(input);
-        }
+        [Fact(Skip = "https://github.com/dotnet/runtime/issues/38539")]
+        public override Task JsonInputFormatter_RoundtripsRecordModel()
+            => base.JsonInputFormatter_RoundtripsRecordModel();
     }
 }

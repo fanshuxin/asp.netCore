@@ -71,7 +71,7 @@ namespace Wasm.Performance.Driver
             Console.WriteLine($"Test app listening at {testAppUrl}.");
 
             var firstRun = true;
-            var timeForEachRun = TimeSpan.FromMinutes(3);
+            var timeForEachRun = TimeSpan.FromMinutes(10);
 
             var launchUrl = $"{testAppUrl}?resultsUrl={UrlEncoder.Default.Encode(receiverUrl)}#automated";
             browser.Url = launchUrl;

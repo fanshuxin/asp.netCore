@@ -167,11 +167,12 @@ export module DotNet {
      *
      * @param identifier Identifies the globally-reachable function to invoke.
      * @param argsJson JSON representation of arguments to be passed to the function.
-     * @returns JSON representation of the invocation result.
+     * @param treatResultAsVoid If true, indicates that the return value should be null.
+     * @returns JSON representation of the invocation result, or null.
      */
-    invokeJSFromDotNet: (identifier: string, argsJson: string) => {
+    invokeJSFromDotNet: (identifier: string, argsJson: string, treatResultAsVoid: boolean) => {
       const result = findJSFunction(identifier).apply(null, parseJsonWithRevivers(argsJson));
-      return result === null || result === undefined
+      return result === null || result === undefined || treatResultAsVoid
         ? null
         : JSON.stringify(result, argReplacer);
     },
@@ -182,8 +183,9 @@ export module DotNet {
      * @param asyncHandle A value identifying the asynchronous operation. This value will be passed back in a later call to endInvokeJSFromDotNet.
      * @param identifier Identifies the globally-reachable function to invoke.
      * @param argsJson JSON representation of arguments to be passed to the function.
+     * @param treatResultAsVoid If true, indicates that if the promise completes successfully, it should do so with a null value.
      */
-    beginInvokeJSFromDotNet: (asyncHandle: number, identifier: string, argsJson: string): void => {
+    beginInvokeJSFromDotNet: (asyncHandle: number, identifier: string, argsJson: string, treatResultAsVoid: boolean): void => {
       // Coerce synchronous functions into async ones, plus treat
       // synchronous exceptions the same as async ones
       const promise = new Promise<any>(resolve => {
@@ -196,7 +198,7 @@ export module DotNet {
         // On completion, dispatch result back to .NET
         // Not using "await" because it codegens a lot of boilerplate
         promise.then(
-          result => getRequiredDispatcher().endInvokeJSFromDotNet(asyncHandle, true, JSON.stringify([asyncHandle, true, result], argReplacer)),
+          result => getRequiredDispatcher().endInvokeJSFromDotNet(asyncHandle, true, treatResultAsVoid ? null : JSON.stringify([asyncHandle, true, result], argReplacer)),
           error => getRequiredDispatcher().endInvokeJSFromDotNet(asyncHandle, false, JSON.stringify([asyncHandle, false, formatError(error)]))
         );
       }

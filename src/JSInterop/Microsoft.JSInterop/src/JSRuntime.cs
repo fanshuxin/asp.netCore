@@ -112,7 +112,14 @@ namespace Microsoft.JSInterop
                 var argsJson = args?.Any() == true ?
                     JsonSerializer.Serialize(args, JsonSerializerOptions) :
                     null;
-                BeginInvokeJS(taskId, identifier, argsJson);
+                if (typeof (TValue) == typeof(VoidResult))
+                {
+                    BeginInvokeJSVoid(taskId, identifier, argsJson);
+                }
+                else
+                {
+                    BeginInvokeJS(taskId, identifier, argsJson);
+                }
 
                 return new ValueTask<TValue>(tcs.Task);
             }
@@ -141,6 +148,20 @@ namespace Microsoft.JSInterop
         protected abstract void BeginInvokeJS(long taskId, string identifier, string? argsJson);
 
         /// <summary>
+        /// Begins an asynchronous function invocation.
+        /// </summary>
+        /// <param name="taskId">The identifier for the function invocation, or zero if no async callback is required.</param>
+        /// <param name="identifier">The identifier for the function to invoke.</param>
+        /// <param name="argsJson">A JSON representation of the arguments.</param>
+        protected virtual void BeginInvokeJSVoid(long taskId, string identifier, string? argsJson)
+        {
+            // For back-compat, the default implementation is identical to BeginInvokeJS, and the
+            // caller can just disregard the result.
+            // Subclasses can provide a more optimal implementation that doesn't JSON-serialize the result
+            BeginInvokeJS(taskId, identifier, argsJson);
+        }
+
+        /// <summary>
         /// Completes an async JS interop call from JavaScript to .NET
         /// </summary>
         /// <param name="invocationInfo">The <see cref="DotNetInvocationInfo"/>.</param>
@@ -166,7 +187,12 @@ namespace Microsoft.JSInterop
                 {
                     var resultType = TaskGenericsUtil.GetTaskCompletionSourceResultType(tcs);
 
-                    var result = JsonSerializer.Deserialize(ref jsonReader, resultType, JsonSerializerOptions);
+                    // For VoidResult, the built-in JSRuntime implementations will always return a null JSON
+                    // response. For consistency with other JSRuntime implementations, even if they do return
+                    // some nonnull JSON, skip parsing it.
+                    var result = resultType == typeof(VoidResult)
+                        ? default(VoidResult)
+                        : JsonSerializer.Deserialize(ref jsonReader, resultType, JsonSerializerOptions);
                     TaskGenericsUtil.SetTaskCompletionSourceResult(tcs, result);
                 }
                 else

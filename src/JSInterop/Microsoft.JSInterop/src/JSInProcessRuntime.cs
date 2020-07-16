@@ -21,13 +21,22 @@ namespace Microsoft.JSInterop
         [return: MaybeNull]
         public TValue Invoke<TValue>(string identifier, params object[] args)
         {
-            var resultJson = InvokeJS(identifier, JsonSerializer.Serialize(args, JsonSerializerOptions));
-            if (resultJson is null)
+            var serializedArgs = JsonSerializer.Serialize(args, JsonSerializerOptions);
+            if (typeof(TValue) == typeof(VoidResult))
             {
+                InvokeJSVoid(identifier, serializedArgs);
                 return default;
             }
+            else
+            {
+                var resultJson = InvokeJS(identifier, serializedArgs);
+                if (resultJson is null)
+                {
+                    return default;
+                }
 
-            return JsonSerializer.Deserialize<TValue>(resultJson, JsonSerializerOptions);
+                return JsonSerializer.Deserialize<TValue>(resultJson, JsonSerializerOptions);
+            }
         }
 
         /// <summary>
@@ -37,5 +46,17 @@ namespace Microsoft.JSInterop
         /// <param name="argsJson">A JSON representation of the arguments.</param>
         /// <returns>A JSON representation of the result.</returns>
         protected abstract string? InvokeJS(string identifier, string? argsJson);
+
+        /// <summary>
+        /// Performs a synchronous function invocation without returning a result.
+        /// </summary>
+        /// <param name="identifier">The identifier for the function to invoke.</param>
+        /// <param name="argsJson">A JSON representation of the arguments.</param>
+        protected virtual void InvokeJSVoid(string identifier, string? argsJson)
+        {
+            // For back-compat, the default implementation calls InvokeJS and discards the result
+            // Subclasses can provide a more optimal implementation that doesn't JSON-serialize the result
+            InvokeJS(identifier, argsJson);
+        }
     }
 }

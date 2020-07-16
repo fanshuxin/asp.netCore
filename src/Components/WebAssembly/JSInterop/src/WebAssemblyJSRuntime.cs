@@ -24,9 +24,26 @@ namespace Microsoft.JSInterop.WebAssembly
         }
 
         /// <inheritdoc />
+        protected virtual void InvokeJSVoid(string identifier, string? argsJson)
+        {
+            var noAsyncHandle = default(long);
+            InternalCalls.InvokeJSMarshalled(out var exception, ref noAsyncHandle, identifier, argsJson, treatResultAsVoid: true);
+            if (exception != null)
+            {
+                throw new JSException(exception);
+            }
+        }
+
+        /// <inheritdoc />
         protected override void BeginInvokeJS(long asyncHandle, string identifier, string argsJson)
         {
             InternalCalls.InvokeJSMarshalled(out _, ref asyncHandle, identifier, argsJson);
+        }
+
+        /// <inheritdoc />
+        protected override void BeginInvokeJSVoid(long asyncHandle, string identifier, string argsJson)
+        {
+            InternalCalls.InvokeJSMarshalled(out _, ref asyncHandle, identifier, argsJson, treatResultAsVoid: true);
         }
 
         protected override void EndInvokeDotNet(DotNetInvocationInfo callInfo, in DotNetInvocationResult dispatchResult)

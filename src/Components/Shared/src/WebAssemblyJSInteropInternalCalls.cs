@@ -22,6 +22,9 @@ namespace WebAssembly.JSInterop
         public static extern string InvokeJSMarshalled(out string exception, ref long asyncHandle, string functionIdentifier, string argsJson);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern string InvokeJSMarshalled(out string exception, ref long asyncHandle, string functionIdentifier, string argsJson, bool treatResultAsVoid);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern TRes InvokeJSUnmarshalled<T0, T1, T2, TRes>(out string exception, string functionIdentifier, [AllowNull] T0 arg0, [AllowNull] T1 arg1, [AllowNull] T2 arg2);
     }
 }

@@ -73,12 +73,12 @@ namespace Microsoft.AspNetCore.Components.Server.Circuits
 
         protected override void BeginInvokeJS(long asyncHandle, string identifier, string argsJson)
         {
-            BeginInvokeJSCore(asyncHandle, identifier, asyncHandle, treatResultAsVoid: false);
+            BeginInvokeJSCore(asyncHandle, identifier, argsJson, treatResultAsVoid: false);
         }
 
         protected override void BeginInvokeJSVoid(long asyncHandle, string identifier, string argsJson)
         {
-            BeginInvokeJSCore(asyncHandle, identifier, asyncHandle, treatResultAsVoid: true);
+            BeginInvokeJSCore(asyncHandle, identifier, argsJson, treatResultAsVoid: true);
         }
 
         private void BeginInvokeJSCore(long asyncHandle, string identifier, string argsJson, bool treatResultAsVoid)

@@ -24,7 +24,7 @@ namespace Microsoft.JSInterop.WebAssembly
         }
 
         /// <inheritdoc />
-        protected virtual void InvokeJSVoid(string identifier, string? argsJson)
+        protected override void InvokeJSVoid(string identifier, string argsJson)
         {
             var noAsyncHandle = default(long);
             InternalCalls.InvokeJSMarshalled(out var exception, ref noAsyncHandle, identifier, argsJson, treatResultAsVoid: true);

@@ -73,6 +73,16 @@ namespace Microsoft.AspNetCore.Components.Server.Circuits
 
         protected override void BeginInvokeJS(long asyncHandle, string identifier, string argsJson)
         {
+            BeginInvokeJSCore(asyncHandle, identifier, asyncHandle, treatResultAsVoid: false);
+        }
+
+        protected override void BeginInvokeJSVoid(long asyncHandle, string identifier, string argsJson)
+        {
+            BeginInvokeJSCore(asyncHandle, identifier, asyncHandle, treatResultAsVoid: true);
+        }
+
+        private void BeginInvokeJSCore(long asyncHandle, string identifier, string argsJson, bool treatResultAsVoid)
+        {
             if (_clientProxy is null)
             {
                 throw new InvalidOperationException(
@@ -83,7 +93,7 @@ namespace Microsoft.AspNetCore.Components.Server.Circuits
 
             Log.BeginInvokeJS(_logger, asyncHandle, identifier);
 
-            _clientProxy.SendAsync("JS.BeginInvokeJS", asyncHandle, identifier, argsJson);
+            _clientProxy.SendAsync("JS.BeginInvokeJS", asyncHandle, identifier, argsJson, treatResultAsVoid);
         }
 
         public static class Log

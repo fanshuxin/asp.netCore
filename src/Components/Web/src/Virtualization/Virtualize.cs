@@ -144,7 +144,7 @@ namespace Microsoft.AspNetCore.Components.Web
 
             builder.OpenRegion(3);
 
-            var lastItemIndex = _itemsBefore + _visibleItemCapacity;
+            var lastItemIndex = Math.Min(_itemsBefore + _visibleItemCapacity, _itemCount);
             var renderIndex = _itemsBefore;
             var placeholdersBeforeCount = Math.Min(_loadedItemsStartIndex, lastItemIndex);
 
@@ -161,17 +161,21 @@ namespace Microsoft.AspNetCore.Components.Web
                     .Skip(_itemsBefore - _loadedItemsStartIndex)
                     .Take(lastItemIndex - _loadedItemsStartIndex);
 
+                builder.OpenRegion(1);
                 foreach (var item in itemsToShow)
                 {
-                    builder.AddContent(0, _itemTemplate, item);
+                    // Rare case where it's valid for the sequence number to be programmatically incremented
+                    // This is only true because we know for certain that no other content will be alongside it
+                    builder.AddContent(renderIndex, _itemTemplate, item);
                     renderIndex++;
                 }
+                builder.CloseRegion();
             }
 
             // Render the placeholders after the loaded items.
             for (; renderIndex < lastItemIndex; renderIndex++)
             {
-                builder.AddContent(0, _placeholder, renderIndex);
+                builder.AddContent(2, _placeholder, renderIndex);
             }
 
             builder.CloseRegion();

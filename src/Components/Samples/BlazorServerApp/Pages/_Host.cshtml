@@ -11,9 +11,10 @@
     <base href="~/" />
     <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
     <link href="css/site.css" rel="stylesheet" />
+    <link href="_content/BlazorServerApp/_framework/scoped.styles.css" rel="stylesheet" />
 </head>
 <body>
-    <app><component type="typeof(App)" render-mode="ServerPrerendered" /></app>
+    <app><component type="typeof(App)" render-mode="Server" /></app>
 
     <script src="_framework/blazor.server.js" autostart="false"></script>
     <script>

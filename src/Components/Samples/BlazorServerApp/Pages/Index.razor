@@ -3,3 +3,48 @@
 <h1>Hello, world!</h1>
 
 Welcome to your new app.
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+        </tr>
+    </thead>
+    <tbody>
+        <Virtualize ItemsProvider="@ProvideItems" ItemSize="40">
+            <Item>
+                <tr @key="@context.Id">
+                    <td>@context.Id</td>
+                    <td>@context.Name</td>
+                </tr>
+            </Item>
+            <Placeholder>
+                <tr>
+                    <td>@context</td>
+                    <td>...</td>
+                </tr>
+            </Placeholder>
+        </Virtualize>
+    </tbody>
+</table>
+
+@code {
+    async ValueTask<ItemsProviderResult<MyThing>> ProvideItems(ItemsProviderRequest request)
+    {
+        Console.WriteLine($"Providing items from start index {request.StartIndex} to {request.StartIndex + request.Count - 1}");
+        var result = Enumerable.Range(request.StartIndex, request.Count)
+            .Select(index => new MyThing { Id = index, Name = $"Item {index}" })
+            .ToList();
+
+        await Task.Delay(1000, request.CancellationToken);
+
+        return new ItemsProviderResult<MyThing>(result, 200);
+    }
+
+    class MyThing
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+    }
+}

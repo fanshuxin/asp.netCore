@@ -157,6 +157,8 @@
             options.transport = signalR.HttpTransportType[transportDropdown.value];
         }
 
+        options.logMessageContent = true;
+
         hubRoute = hubRoute + "?name=" + name;
         console.log('http://' + document.location.host + '/' + hubRoute);
 

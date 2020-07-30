@@ -35,7 +35,7 @@ namespace ClientSample
                 .ConfigureLogging(logging =>
                 {
                     logging.AddConsole();
-                });
+                }).AddMessagePackProtocol();
 
             connectionBuilder.Services.Configure<LoggerFilterOptions>(options =>
             {
@@ -99,7 +99,7 @@ namespace ClientSample
 
                     try
                     {
-                        await connection.InvokeAsync<object>("Send", line);
+                        await connection.InvokeAsync<object>("Send", "CSharp", line);
                     }
                     catch when (closedTokenSource.IsCancellationRequested)
                     {

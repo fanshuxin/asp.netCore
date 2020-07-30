@@ -134,7 +134,7 @@ public class HubConnection implements AutoCloseable {
         }
 
         this.baseUrl = url;
-        this.protocol = new JsonHubProtocol();
+        this.protocol = new MessagePackHubProtocol();
 
         if (accessTokenProvider != null) {
             this.accessTokenProvider = accessTokenProvider;

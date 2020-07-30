@@ -33,7 +33,7 @@ public class Chat {
             while (!message.equals("leave")) {
                 // Scans the next token of the input as an int.
                 message = reader.nextLine();
-                hubConnection.send("Send", message);
+                hubConnection.send("Send", "java", message);
             }
 
             hubConnection.stop().blockingAwait();

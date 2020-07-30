@@ -31,13 +31,12 @@ namespace SignalRSamples
                     {
                         factory.AddConfiguration(c.Configuration.GetSection("Logging"));
                         factory.AddConsole();
+                        factory.SetMinimumLevel(LogLevel.Trace);
                     })
                     .UseKestrel(options =>
                     {
                         // Default port
-                        options.ListenLocalhost(5000, o =>
-                            o.UseConnectionLogging()
-                            );
+                        options.ListenLocalhost(5000);
 
                         // Hub bound to TCP end point
                         options.Listen(IPAddress.Any, 9001, builder =>

@@ -63,7 +63,7 @@ class OkHttpWebSocketWrapper extends WebSocketWrapper {
 
     @Override
     public Completable send(String message) {
-        websocketClient.send(message);
+        websocketClient.send(ByteString.of(message.getBytes(StandardCharsets.ISO_8859_1)));
         return Completable.complete();
     }
 

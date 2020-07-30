@@ -55,6 +55,7 @@ class MessagePackHubProtocol implements HubProtocol {
             byte[] payloadBytes = payload.getBytes(StandardCharsets.ISO_8859_1);
             ByteBuffer bb = ByteBuffer.wrap(payloadBytes);
             while (bb.hasRemaining()) {
+            	
                 int length = Utils.readLengthHeader(bb);
                 // Throw if remaining buffer is shorter than length header
                 if (bb.remaining() < length) {
@@ -154,8 +155,12 @@ class MessagePackHubProtocol implements HubProtocol {
         
     private HubMessage createInvocationMessage(MessageUnpacker unpacker, InvocationBinder binder, int itemCount) throws IOException {
         Map<String, String> headers = readHeaders(unpacker);
-        String invocationId = unpacker.unpackString();
         
+        // invocationId may be nil
+        String invocationId = null;
+        if (!unpacker.tryUnpackNil()) {
+        	invocationId = unpacker.unpackString();
+        }
         // For MsgPack, we represent an empty invocation ID as an empty string,
         // so we need to normalize that to "null", which is what indicates a non-blocking invocation.
         if (invocationId == null || invocationId.isEmpty()) {

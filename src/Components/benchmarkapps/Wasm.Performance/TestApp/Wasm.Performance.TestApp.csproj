@@ -5,6 +5,8 @@
     <RuntimeIdentifier>browser-wasm</RuntimeIdentifier>
     <UseBlazorWebAssembly>true</UseBlazorWebAssembly>
     <IsTestAssetProject>true</IsTestAssetProject>
+    <!-- Workaround for intermittent cache issue: DOMException: Failed to execute 'arrayBuffer' on 'Response': Body stream has suffered a fatal error and cannot be inspected -->
+    <BlazorCacheBootResources>false</BlazorCacheBootResources>
   </PropertyGroup>
 
   <ItemGroup>

@@ -14,7 +14,7 @@ namespace Microsoft.AspNetCore.Http
     // FYI: In most cases the source will be a FileStream and the destination will be to the network.
     internal static class StreamCopyOperationInternal
     {
-        private const int DefaultBufferSize = 4096;
+        private const int DefaultBufferSize = 4 * 1024;
 
         /// <summary>Asynchronously reads the given number of bytes from the source stream and writes them to another stream.</summary>
         /// <returns>A task that represents the asynchronous copy operation.</returns>
@@ -91,50 +91,59 @@ namespace Microsoft.AspNetCore.Http
         /// <param name="writer">The PipeWriter to which the contents of the current stream will be copied.</param>
         /// <param name="count">The count of bytes to be copied.</param>
         /// <param name="cancel">The token to monitor for cancellation requests.</param>
-        public static async Task CopyToAsync(Stream source, PipeWriter writer, long? count, CancellationToken cancel)
+        public static Task CopyToAsync(Stream source, PipeWriter writer, long? count, CancellationToken cancel)
         {
-            long? bytesRemaining = count;
+            if (count == null)
+            {
+                // No length, do a copy with the default buffer size (based on whatever the pipe settings are, default is 4K)
+                return source.CopyToAsync(writer, cancel);
+            }
+
+            static async Task CopyToAsync(Stream source, PipeWriter writer, long bytesRemaining, CancellationToken cancel)
+            {
+                // The maximum array pooled buffer is 2MB (we'll allocate 1MB maximum)
+                const int maxBufferSize = 1 * 1024 * 1024;
+                const int minBufferSize = 1024;
+
+                // We know exactly how much we're going to copy
+                while (bytesRemaining > 0)
+                {
+                    var bufferSize = (int)Math.Clamp(bytesRemaining, minBufferSize, maxBufferSize);
+
+                    // The natural end of the range.
+                    var memory = writer.GetMemory(bufferSize);
+
+                    if (memory.Length > bytesRemaining)
+                    {
+                        memory = memory.Slice(0, (int)bytesRemaining);
+                    }
+
+                    var read = await source.ReadAsync(memory, cancel);
+
+                    bytesRemaining -= read;
+
+                    // End of the source stream.
+                    if (read == 0)
+                    {
+                        break;
+                    }
+
+                    writer.Advance(read);
+
+                    var result = await writer.FlushAsync(cancel);
+
+                    if (result.IsCompleted)
+                    {
+                        break;
+                    }
+                }
+            }
 
             Debug.Assert(source != null);
             Debug.Assert(writer != null);
-            Debug.Assert(!bytesRemaining.HasValue || bytesRemaining.Value >= 0);
+            Debug.Assert(count >= 0);
 
-            while (true)
-            {
-                // The natural end of the range.
-                if (bytesRemaining.HasValue && bytesRemaining.Value <= 0)
-                {
-                    return;
-                }
-
-                var memory = writer.GetMemory();
-                if (bytesRemaining.HasValue && memory.Length > bytesRemaining.Value)
-                {
-                    memory = memory.Slice(0, (int)bytesRemaining.Value);
-                }
-
-                var read = await source.ReadAsync(memory, cancel);
-
-                if (bytesRemaining.HasValue)
-                {
-                    bytesRemaining -= read;
-                }
-
-                // End of the source stream.
-                if (read == 0)
-                {
-                    break;
-                }
-
-                writer.Advance(read);
-
-                var result = await writer.FlushAsync(cancel);
-
-                if (result.IsCompleted)
-                {
-                    break;
-                }
-            }
+            return CopyToAsync(source, writer, count.Value, cancel);
         }
     }
 }

@@ -101,8 +101,8 @@ namespace Microsoft.AspNetCore.Http
 
             static async Task CopyToAsync(Stream source, PipeWriter writer, long bytesRemaining, CancellationToken cancel)
             {
-                // The maximum array pooled buffer is 2MB (we'll allocate 1MB maximum)
-                const int maxBufferSize = 1 * 1024 * 1024;
+                // The array pool likes powers of 2
+                const int maxBufferSize = 64 * 1024;
                 const int minBufferSize = 1024;
 
                 // We know exactly how much we're going to copy

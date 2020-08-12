@@ -74,6 +74,7 @@ export class BrowserRenderer {
   }
 
   public disposeEventHandler(eventHandlerId: number) {
+    console.log('JS: I now know that the following event is disposed: ' + eventHandlerId);
     this.eventDelegator.removeListener(eventHandlerId);
   }
 

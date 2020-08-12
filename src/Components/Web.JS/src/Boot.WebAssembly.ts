@@ -26,7 +26,10 @@ async function boot(options?: Partial<WebAssemblyStartOptions>): Promise<void> {
     // renderbatch. For example, a renderbatch might mutate the DOM in such a way as to cause an <input> to lose
     // focus, in turn triggering a 'change' event. It may also be possible to listen to other DOM mutation events
     // that are themselves triggered by the application of a renderbatch.
-    monoPlatform.invokeWhenHeapUnlocked(() => DotNet.invokeMethodAsync('Microsoft.AspNetCore.Components.WebAssembly', 'DispatchEvent', eventDescriptor, JSON.stringify(eventArgs)));
+    monoPlatform.invokeWhenHeapUnlocked(() => {
+      console.log('JS: will now notify .NET about event ' + eventDescriptor.eventHandlerId);
+      DotNet.invokeMethodAsync('Microsoft.AspNetCore.Components.WebAssembly', 'DispatchEvent', eventDescriptor, JSON.stringify(eventArgs));
+    });
   });
 
   // Configure environment for execution under Mono WebAssembly with shared-memory rendering

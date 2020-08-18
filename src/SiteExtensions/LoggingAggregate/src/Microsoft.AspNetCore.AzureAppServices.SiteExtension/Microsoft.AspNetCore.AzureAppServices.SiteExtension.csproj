@@ -17,7 +17,7 @@
     <NoSemVer20>true</NoSemVer20>
     <IsPackable>true</IsPackable>
     <IsShipping>true</IsShipping>
-    <IsShipping Condition=" '$(PreReleaseVersionLabel)' == 'preview' ">false</IsShipping>
+    <IsShipping Condition=" '$(PreReleaseVersionLabel)' == 'preview' OR '$(PreReleaseVersionLabel)' == 'alpha' ">false</IsShipping>
 
     <!-- Grab packages LB.csproj should have just built. -->
     <RestoreAdditionalProjectSources>$(RestoreAdditionalProjectSources);$(ArtifactsNonShippingPackagesDir)</RestoreAdditionalProjectSources>
@@ -28,9 +28,6 @@
     <Reference Include="Microsoft.AspNetCore.AzureAppServices.SiteExtension.2.2" PrivateAssets="All" />
     <Reference Include="Microsoft.AspNetCore.AzureAppServices.SiteExtension.3.1.x64" PrivateAssets="All" />
     <Reference Include="Microsoft.AspNetCore.AzureAppServices.SiteExtension.3.1.x86" PrivateAssets="All" />
-    <!-- When updating this add the previous SiteExtension(s) to the list above -->
-    <PackageReference Include="Microsoft.AspNetCore.AzureAppServices.SiteExtension.5.0.x86" Version="$(PackageVersion)" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.AspNetCore.AzureAppServices.SiteExtension.5.0.x64" Version="$(PackageVersion)" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>
@@ -53,10 +50,14 @@
     </MSBuild>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.AspNetCore.AzureAppServices.SiteExtension.3.1.x86"
+      <!--
+        When updating AspNetCoreMajorVersion or AspNetCoreMinorVersion, add the following SiteExtension packages to
+        the list above and bump the version here.
+      -->
+      <PackageReference Include="Microsoft.AspNetCore.AzureAppServices.SiteExtension.5.0.x86"
           Version="%(_ResolvedPackageVersionInfo.PackageVersion)"
           PrivateAssets="All" />
-      <PackageReference Include="Microsoft.AspNetCore.AzureAppServices.SiteExtension.3.1.x64"
+      <PackageReference Include="Microsoft.AspNetCore.AzureAppServices.SiteExtension.5.0.x64"
           Version="%(_ResolvedPackageVersionInfo.PackageVersion)"
           PrivateAssets="All" />
     </ItemGroup>

@@ -5,6 +5,7 @@
     <AssemblyName>Microsoft.DotNet.Watcher.Tools.Tests</AssemblyName>
     <DefaultItemExcludes>$(DefaultItemExcludes);TestProjects\**\*</DefaultItemExcludes>
     <TestGroupName>DotNetWatcherToolsTests</TestGroupName>
+    <SkipHelixQueues>Windows.10.Arm64;Windows.10.Arm64.Open</SkipHelixQueues>
   </PropertyGroup>
 
   <ItemGroup>

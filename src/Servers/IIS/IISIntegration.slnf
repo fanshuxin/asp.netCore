@@ -23,6 +23,7 @@
       "src\\Servers\\IIS\\IIS\\test\\IIS.Tests\\IIS.Tests.csproj",
       "src\\Servers\\IIS\\IIS\\test\\IISExpress.FunctionalTests\\IISExpress.FunctionalTests.csproj",
       "src\\Servers\\IIS\\IIS\\test\\testassets\\InProcessWebSite\\InProcessWebSite.csproj",
+      "src\\Servers\\IIS\\IIS\\test\\testassets\\SignalRSample\\WebApplication2.csproj",
       "src\\Servers\\IIS\\IntegrationTesting.IIS\\src\\Microsoft.AspNetCore.Server.IntegrationTesting.IIS.csproj"
     ]
   }

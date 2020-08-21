@@ -28,7 +28,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <IISExpressArguments>/config:"$(IISExpressAppHostConfig)" /systray:false</IISExpressArguments>
+    <IISExpressArguments>/config:"$(IISExpressAppHostConfig)" /systray:false /trace:error</IISExpressArguments>
     <IISArguments>-h "$(IISAppHostConfig)"</IISArguments>
 
     <AncmInProcessRHPath>aspnetcorev2_inprocess.dll</AncmInProcessRHPath>

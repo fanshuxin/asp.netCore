@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.ObjectPool;
@@ -422,13 +423,13 @@ namespace Microsoft.AspNetCore.ResponseCaching
         internal void ShimResponseStream(ResponseCachingContext context)
         {
             // Shim response stream
-            context.OriginalResponseStream = context.HttpContext.Response.Body;
+            context.OriginalResponseFeature = context.HttpContext.Features.Get<IHttpResponseBodyFeature>();
             context.ResponseCachingStream = new ResponseCachingStream(
-                context.OriginalResponseStream,
+                context.OriginalResponseFeature,
                 _options.MaximumBodySize,
                 StreamUtilities.BodySegmentSize,
                 () => StartResponse(context));
-            context.HttpContext.Response.Body = context.ResponseCachingStream;
+            context.HttpContext.Features.Set<IHttpResponseBodyFeature>(context.ResponseCachingStream);
 
             // Add IResponseCachingFeature
             AddResponseCachingFeature(context.HttpContext);
@@ -440,7 +441,7 @@ namespace Microsoft.AspNetCore.ResponseCaching
         internal static void UnshimResponseStream(ResponseCachingContext context)
         {
             // Unshim response stream
-            context.HttpContext.Response.Body = context.OriginalResponseStream;
+            context.HttpContext.Features.Set<IHttpResponseBodyFeature>(context.OriginalResponseFeature);
 
             // Remove IResponseCachingFeature
             RemoveResponseCachingFeature(context.HttpContext);

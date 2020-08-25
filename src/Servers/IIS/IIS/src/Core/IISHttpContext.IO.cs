@@ -185,6 +185,10 @@ namespace Microsoft.AspNetCore.Server.IIS.Core
 
                         if (flush)
                         {
+                            if (result.IsCanceled)
+                            {
+                                Console.WriteLine("test");
+                            }
                             await AsyncIO.FlushAsync(moreData: true);
                             flush = false;
                         }

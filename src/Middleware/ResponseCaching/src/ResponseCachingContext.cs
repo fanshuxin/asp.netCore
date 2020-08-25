@@ -49,7 +49,7 @@ namespace Microsoft.AspNetCore.ResponseCaching
 
         internal bool ResponseStarted { get; set; }
 
-        internal Stream OriginalResponseStream { get; set; }
+        internal IHttpResponseBodyFeature OriginalResponseFeature { get; set; }
 
         internal ResponseCachingStream ResponseCachingStream { get; set; }
 

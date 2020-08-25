@@ -3,22 +3,25 @@
 
 using System;
 using System.IO;
+using System.IO.Pipelines;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http.Features;
 
 namespace Microsoft.AspNetCore.ResponseCaching
 {
-    internal class ResponseCachingStream : Stream
+    internal class ResponseCachingStream : Stream, IHttpResponseBodyFeature
     {
-        private readonly Stream _innerStream;
+        private readonly IHttpResponseBodyFeature _innerBody;
         private readonly long _maxBufferSize;
         private readonly int _segmentSize;
         private readonly SegmentWriteStream _segmentWriteStream;
         private readonly Action _startResponseCallback;
+        private PipeWriter _pipeAdapter = null;
 
-        internal ResponseCachingStream(Stream innerStream, long maxBufferSize, int segmentSize, Action startResponseCallback)
+        internal ResponseCachingStream(IHttpResponseBodyFeature innerBody, long maxBufferSize, int segmentSize, Action startResponseCallback)
         {
-            _innerStream = innerStream;
+            _innerBody = innerBody;
             _maxBufferSize = maxBufferSize;
             _segmentSize = segmentSize;
             _startResponseCallback = startResponseCallback;
@@ -27,21 +30,36 @@ namespace Microsoft.AspNetCore.ResponseCaching
 
         internal bool BufferingEnabled { get; private set; } = true;
 
-        public override bool CanRead => _innerStream.CanRead;
+        public override bool CanRead => _innerBody.Stream.CanRead;
 
-        public override bool CanSeek => _innerStream.CanSeek;
+        public override bool CanSeek => _innerBody.Stream.CanSeek;
 
-        public override bool CanWrite => _innerStream.CanWrite;
+        public override bool CanWrite => _innerBody.Stream.CanWrite;
 
-        public override long Length => _innerStream.Length;
+        public override long Length => _innerBody.Stream.Length;
 
         public override long Position
         {
-            get { return _innerStream.Position; }
+            get { return _innerBody.Stream.Position; }
             set
             {
                 DisableBuffering();
-                _innerStream.Position = value;
+                _innerBody.Stream.Position = value;
+            }
+        }
+
+        public Stream Stream => this;
+
+        public PipeWriter Writer
+        {
+            get
+            {
+                if (_pipeAdapter == null)
+                {
+                    _pipeAdapter = PipeWriter.Create(Stream, new StreamPipeWriterOptions(leaveOpen: true));
+                }
+
+                return _pipeAdapter;
             }
         }
 
@@ -63,13 +81,13 @@ namespace Microsoft.AspNetCore.ResponseCaching
         public override void SetLength(long value)
         {
             DisableBuffering();
-            _innerStream.SetLength(value);
+            _innerBody.Stream.SetLength(value);
         }
 
         public override long Seek(long offset, SeekOrigin origin)
         {
             DisableBuffering();
-            return _innerStream.Seek(offset, origin);
+            return _innerBody.Stream.Seek(offset, origin);
         }
 
         public override void Flush()
@@ -77,7 +95,7 @@ namespace Microsoft.AspNetCore.ResponseCaching
             try
             {
                 _startResponseCallback();
-                _innerStream.Flush();
+                _innerBody.Stream.Flush();
             }
             catch
             {
@@ -91,7 +109,7 @@ namespace Microsoft.AspNetCore.ResponseCaching
             try
             {
                 _startResponseCallback();
-                await _innerStream.FlushAsync();
+                await _innerBody.Stream.FlushAsync();
             }
             catch
             {
@@ -102,14 +120,14 @@ namespace Microsoft.AspNetCore.ResponseCaching
 
         // Underlying stream is write-only, no need to override other read related methods
         public override int Read(byte[] buffer, int offset, int count)
-            => _innerStream.Read(buffer, offset, count);
+            => _innerBody.Stream.Read(buffer, offset, count);
 
         public override void Write(byte[] buffer, int offset, int count)
         {
             try
             {
                 _startResponseCallback();
-                _innerStream.Write(buffer, offset, count);
+                _innerBody.Stream.Write(buffer, offset, count);
             }
             catch
             {
@@ -135,7 +153,7 @@ namespace Microsoft.AspNetCore.ResponseCaching
             try
             {
                 _startResponseCallback();
-                await _innerStream.WriteAsync(buffer, offset, count, cancellationToken);
+                await _innerBody.Stream.WriteAsync(buffer, offset, count, cancellationToken);
             }
             catch
             {
@@ -160,7 +178,7 @@ namespace Microsoft.AspNetCore.ResponseCaching
         {
             try
             {
-                _innerStream.WriteByte(value);
+                _innerBody.Stream.WriteByte(value);
             }
             catch
             {
@@ -193,6 +211,36 @@ namespace Microsoft.AspNetCore.ResponseCaching
                 throw new ArgumentNullException(nameof(asyncResult));
             }
             ((Task)asyncResult).GetAwaiter().GetResult();
+        }
+
+        void IHttpResponseBodyFeature.DisableBuffering()
+        {
+            _innerBody.DisableBuffering();
+        }
+
+        public async Task StartAsync(CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                _startResponseCallback();
+                await _innerBody.Stream.FlushAsync();
+            }
+            catch
+            {
+                DisableBuffering();
+                throw;
+            }
+        }
+
+        public Task SendFileAsync(string path, long offset, long? count, CancellationToken cancellationToken = default)
+        {
+            return _innerBody.SendFileAsync(path, offset, count, cancellationToken);
+        }
+
+        public Task CompleteAsync()
+        {
+            // TODO
+            return _innerBody.CompleteAsync();
         }
     }
 }

@@ -7,6 +7,11 @@
     <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <DisableRarCache>true</DisableRarCache>
+    <ResolveAssemblyReferencesStateFile></ResolveAssemblyReferencesStateFile>
+  </PropertyGroup>
+
   <!-- Defines project type conventions. -->
   <PropertyGroup>
     <RepoRelativeProjectDir>$([MSBuild]::MakeRelative($(RepoRoot), $(MSBuildProjectDirectory)))</RepoRelativeProjectDir>

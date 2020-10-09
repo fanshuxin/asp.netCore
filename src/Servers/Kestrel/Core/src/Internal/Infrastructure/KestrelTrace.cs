@@ -117,6 +117,10 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Infrastructure
             LoggerMessage.Define<string>(LogLevel.Debug, new EventId(40, nameof(Http2MaxConcurrentStreamsReached)),
                 @"Connection id ""{ConnectionId}"" reached the maximum number of concurrent HTTP/2 streams allowed.");
 
+        private static readonly Action<ILogger, string, long, Exception> _http3ConnectionClosed =
+            LoggerMessage.Define<string, long>(LogLevel.Debug, new EventId(41, nameof(Http3ConnectionClosed)),
+                @"Connection id ""{ConnectionId}"" is closed. The last processed stream ID was {HighestOpenedStreamId}.");
+
         protected readonly ILogger _logger;
 
         public KestrelTrace(ILogger logger)
@@ -293,6 +297,11 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Infrastructure
         public void Http2MaxConcurrentStreamsReached(string connectionId)
         {
             _http2MaxConcurrentStreamsReached(_logger, connectionId, null);
+        }
+
+        public void Http3ConnectionClosed(string connectionId, long highestOpenedStreamId)
+        {
+            _http3ConnectionClosed(_logger, connectionId, highestOpenedStreamId, null);
         }
 
         public virtual void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)

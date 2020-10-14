@@ -39,7 +39,7 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core.Internal
 
             var connection = new Http3Connection(http3ConnectionContext);
 
-            return connection.ProcessRequestsAsync(_application);
+            return connection.ProcessStreamsAsync(_application);
         }
     }
 }

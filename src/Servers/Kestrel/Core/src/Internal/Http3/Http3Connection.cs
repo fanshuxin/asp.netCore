@@ -19,7 +19,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http3
 {
-    internal class Http3Connection : IRequestProcessor, ITimeoutHandler
+    internal class Http3Connection : ITimeoutHandler
     {
         public DynamicTable DynamicTable { get; set; }
 
@@ -76,7 +76,7 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http3
 
         private IKestrelTrace Log => _context.ServiceContext.Log;
 
-        public async Task ProcessRequestsAsync<TContext>(IHttpApplication<TContext> httpApplication)
+        public Task ProcessStreamsAsync<TContext>(IHttpApplication<TContext> httpApplication)
         {
             try
             {
@@ -97,28 +97,22 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http3
                 connectionHeartbeatFeature?.OnHeartbeat(state => ((Http3Connection)state).Tick(), this);
 
                 // Register for graceful shutdown of the server
-                using var shutdownRegistration = connectionLifetimeNotificationFeature?.ConnectionClosedRequested.Register(state => ((Http3Connection)state).StopProcessingNextRequest(), this);
+                using var shutdownRegistration = connectionLifetimeNotificationFeature?.ConnectionClosedRequested.Register(state => ((Http3Connection)state).StopProcessingStreams(), this);
 
                 // Register for connection close
                 using var closedRegistration = _context.ConnectionContext.ConnectionClosed.Register(state => ((Http3Connection)state).OnConnectionClosed(), this);
 
-                await InnerProcessRequestsAsync(httpApplication);
+                return InnerProcessStreamsAsync(httpApplication);
             }
             catch (Exception ex)
             {
-                Log.LogCritical(0, ex, $"Unexpected exception in {nameof(Http3Connection)}.{nameof(ProcessRequestsAsync)}.");
+                Log.LogCritical(0, ex, $"Unexpected exception in {nameof(Http3Connection)}.{nameof(ProcessStreamsAsync)}.");
             }
-            finally
-            {
-            }
+
+            return Task.CompletedTask;
         }
 
-        // For testing only
-        internal void Initialize()
-        {
-        }
-
-        public void StopProcessingNextRequest()
+        public void StopProcessingStreams()
         {
             bool previousState;
             lock (_protocolSelectionLock)
@@ -180,7 +174,7 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http3
             switch (reason)
             {
                 case TimeoutReason.KeepAlive:
-                    StopProcessingNextRequest();
+                    StopProcessingStreams();
                     break;
                 case TimeoutReason.RequestHeaders:
                     HandleRequestHeadersTimeout();
@@ -202,7 +196,7 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http3
             }
         }
 
-        internal async Task InnerProcessRequestsAsync<TContext>(IHttpApplication<TContext> application)
+        internal async Task InnerProcessStreamsAsync<TContext>(IHttpApplication<TContext> application)
         {
             // Start other three unidirectional streams here.
             var controlTask = CreateControlStream(application);
@@ -275,13 +269,6 @@ namespace Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http3
                         foreach (var stream in _streams.Values)
                         {
                             stream.Abort(_abortedException);
-                        }
-                    }
-                    else
-                    {
-                        foreach (var stream in _streams.Values)
-                        {
-                            stream.OnInputOrOutputCompleted();
                         }
                     }
                 }

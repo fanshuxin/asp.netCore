@@ -236,7 +236,7 @@ namespace Microsoft.AspNetCore.Testing
             _trace2.Http2MaxConcurrentStreamsReached(connectionId);
         }
 
-        public void Http3ConnectionClosed(string connectionId, int highestOpenedStreamId)
+        public void Http3ConnectionClosed(string connectionId, long highestOpenedStreamId)
         {
             _trace1.Http3ConnectionClosed(connectionId, highestOpenedStreamId);
             _trace2.Http3ConnectionClosed(connectionId, highestOpenedStreamId);

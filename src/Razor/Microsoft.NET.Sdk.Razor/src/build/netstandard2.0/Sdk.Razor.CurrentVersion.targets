@@ -1,4 +1,4 @@
-﻿<!--
+<!--
 ***********************************************************************************************
 Sdk.Razor.CurrentVersion.targets
 
@@ -48,6 +48,8 @@ Copyright (c) .NET Foundation. All rights reserved.
       $([MSBuild]::VersionGreaterThanOrEquals('$(TargetFrameworkVersion)', '3.0')) ">true</_TargetingNETCoreApp30OrLater>
     <_TargetingNET50OrLater Condition=" '$(TargetFrameworkIdentifier)' == '.NETCoreApp' AND
       $([MSBuild]::VersionGreaterThanOrEquals('$(TargetFrameworkVersion)', '5.0')) ">true</_TargetingNET50OrLater>
+    <_TargetingNET60OrLater Condition=" '$(TargetFrameworkIdentifier)' == '.NETCoreApp' AND
+      $([MSBuild]::VersionGreaterThanOrEquals('$(TargetFrameworkVersion)', '5.0')) ">true</_TargetingNET60OrLater>
 
     <!--
       Infer the RazorLangVersion if no value was specified. When adding support for newer target frameworks, list newer language versions first.
@@ -354,9 +356,11 @@ Copyright (c) .NET Foundation. All rights reserved.
   <Import Project="Microsoft.NET.Sdk.Razor.Configuration.targets" Condition="'$(_Targeting30OrNewerRazorLangVersion)' == 'true'" />
 
   <!-- For projects targeting 3.x and later, use the compiler that ships in the SDK -->
-  <Import Project="Microsoft.NET.Sdk.Razor.CodeGeneration.targets" Condition="'$(_Targeting30OrNewerRazorLangVersion)' == 'true'" />
+  <Import Project="Microsoft.NET.Sdk.Razor.CodeGeneration.targets" Condition="'$(_Targeting30OrNewerRazorLangVersion)' == 'true' " />
 
-  <Import Project="Microsoft.NET.Sdk.Razor.Component.targets" Condition="'$(_Targeting30OrNewerRazorLangVersion)' == 'true'" />
+  <Import Project="Microsoft.NET.Sdk.Razor.SourceGenerators.targets" Condition="'$(_Targeting30OrNewerRazorLangVersion)' == 'true' AND '$(_TargetingNET60OrLater)' == 'true'" />
+
+  <Import Project="Microsoft.NET.Sdk.Razor.Component.targets" Condition="'$(_Targeting30OrNewerRazorLangVersion)' == 'true' AND '$(_TargetingNET60OrLater)' != 'true'" />
 
   <Import Project="Microsoft.NET.Sdk.Razor.ScopedCss.targets" Condition="'$(ScopedCssEnabled)' == 'true'" />
 

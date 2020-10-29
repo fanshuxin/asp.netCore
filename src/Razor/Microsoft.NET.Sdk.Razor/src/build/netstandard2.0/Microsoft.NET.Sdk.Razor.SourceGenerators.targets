@@ -1,0 +1,48 @@
+<!--
+***********************************************************************************************
+Microsoft.NET.Sdk.Razor.SourceGenerators.targets
+
+WARNING:  DO NOT MODIFY this file unless you are knowledgeable about MSBuild and have
+          created a backup copy.  Incorrect changes to this file will make it
+          impossible to load or build your projects from the command-line or the IDE.
+
+Copyright (c) .NET Foundation. All rights reserved.
+***********************************************************************************************
+-->
+
+<Project ToolsVersion="14.0">
+
+  <PropertyGroup>
+    <CompileDependsOn>
+      <!--
+        Roslyn allows passing additional metadata to source generators using CompilerVisibleProperty \ CompilerVisibleItemMetadata items. These items
+        are evaluated as part of GenerateMSBuildEditorConfigFile, so do any work to prepare for these to be populated prior to this.
+      -->
+      _PrepareRazorSourceGenerators;
+      $(CompileDependsOn);
+    </CompileDependsOn>
+  </PropertyGroup>
+
+  <Target Name="_PrepareRazorSourceGenerators" DependsOnTargets="PrepareForRazorComponentGenerate">
+    <!-- Configure analyzers -->
+    <ItemGroup>
+      <Analyzer Include="D:\work\aspnetcore\artifacts\bin\RazorSourceGenerators\Debug\netstandard2.0\Microsoft.AspNetCore.Razor.Language.dll" />
+      <Analyzer Include="D:\work\aspnetcore\artifacts\bin\RazorSourceGenerators\Debug\netstandard2.0\Microsoft.CodeAnalysis.Razor.dll" />
+      <Analyzer Include="D:\work\aspnetcore\artifacts\bin\RazorSourceGenerators\Debug\netstandard2.0\RazorSourceGenerators.dll" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <!-- Additional metadata and properties that we want the compiler to pass to   the compiler we want to pass additional MSBuild properties \ metadata -->
+      <CompilerVisibleItemMetadata Include="AdditionalFiles" MetadataName="TargetPath" />
+      <CompilerVisibleItemMetadata Include="AdditionalFiles" MetadataName="CssScope" />
+      <CompilerVisibleProperty Include="RazorLangVersion" />
+      <CompilerVisibleProperty Include="RootNamespace" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <!-- Pass razor files to the compiler. -->
+      <AdditionalFiles Include="@(RazorComponentWithTargetPath)" />
+    </ItemGroup>
+ </Target>
+
+</Project>

@@ -3,7 +3,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Text;
 using Microsoft.AspNetCore.Razor.Language;
 
 namespace Microsoft.CodeAnalysis.Razor
@@ -11,20 +14,20 @@ namespace Microsoft.CodeAnalysis.Razor
     internal sealed class StaticCompilationTagHelperFeature : RazorEngineFeatureBase, ITagHelperFeature
     {
         private ITagHelperDescriptorProvider[] _providers;
-        private readonly Func<Compilation> _compilationFactory;
-
-        public StaticCompilationTagHelperFeature(Func<Compilation> compilationFactory)
-        {
-            _compilationFactory = compilationFactory;
-        }
 
         public IReadOnlyList<TagHelperDescriptor> GetDescriptors()
         {
-            var compilation = _compilationFactory();
+            if (Compilation is null)
+            {
+                return Array.Empty<TagHelperDescriptor>();
+            }
+
             var results = new List<TagHelperDescriptor>();
 
+
             var context = TagHelperDescriptorProviderContext.Create(results);
-            context.SetCompilation(_compilationFactory());
+            context.SetCompilation(Compilation);
+            context.DiscoveryMode = DiscoveryMode;
 
             for (var i = 0; i < _providers.Length; i++)
             {
@@ -33,6 +36,10 @@ namespace Microsoft.CodeAnalysis.Razor
 
             return results;
         }
+
+        public Compilation Compilation { get; set; }
+
+        public TagHelperDiscoveryMode DiscoveryMode { get; set; }
 
         protected override void OnInitialized()
         {

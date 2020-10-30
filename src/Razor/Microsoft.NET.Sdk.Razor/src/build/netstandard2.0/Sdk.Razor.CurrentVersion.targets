@@ -48,6 +48,11 @@ Copyright (c) .NET Foundation. All rights reserved.
       $([MSBuild]::VersionGreaterThanOrEquals('$(TargetFrameworkVersion)', '3.0')) ">true</_TargetingNETCoreApp30OrLater>
     <_TargetingNET50OrLater Condition=" '$(TargetFrameworkIdentifier)' == '.NETCoreApp' AND
       $([MSBuild]::VersionGreaterThanOrEquals('$(TargetFrameworkVersion)', '5.0')) ">true</_TargetingNET50OrLater>
+
+    <!--
+      We want to limit support for source generators based compilation to 6.0 or newer in user's apps. This repo is currently
+      stuck on targeting 5.0, so to test our new code, we'll fib a little. This will get fixed eventually.
+    -->
     <_TargetingNET60OrLater Condition=" '$(TargetFrameworkIdentifier)' == '.NETCoreApp' AND
       $([MSBuild]::VersionGreaterThanOrEquals('$(TargetFrameworkVersion)', '5.0')) ">true</_TargetingNET60OrLater>
 
@@ -112,16 +117,6 @@ Copyright (c) .NET Foundation. All rights reserved.
       AssignRazorComponentTargetPaths;
     </PrepareForRazorComponentGenerateDependsOn>
 
-    <RazorGenerateDependsOn>
-      PrepareForRazorGenerate;
-      _CheckForMissingRazorCompiler;
-      RazorCoreGenerate
-    </RazorGenerateDependsOn>
-
-    <RazorComponentGenerateDependsOn>
-      PrepareForRazorComponentGenerate
-    </RazorComponentGenerateDependsOn>
-
     <PrepareForRazorCompileDependsOn>
       RazorGenerate;
       ResolveRazorCompileInputs;
@@ -130,7 +125,6 @@ Copyright (c) .NET Foundation. All rights reserved.
 
     <ResolveRazorCompileInputsDependsOn>
       ResolveRazorEmbeddedResources;
-      _FixupRazorReferencePathForRazorCompile;
     </ResolveRazorCompileInputsDependsOn>
 
     <RazorCompileDependsOn>
@@ -598,17 +592,6 @@ Copyright (c) .NET Foundation. All rights reserved.
       <RazorReferencePath
         Include="@(IntermediateAssembly->Metadata('FullPath'))"
         Condition="'$(_RazorComponentDeclarationAssemblyFullPath)' == ''" />
-    </ItemGroup>
-  </Target>
-
-  <Target Name="_FixupRazorReferencePathForRazorCompile" Condition="'$(_RazorComponentDeclarationAssemblyFullPath)' != ''">
-    <!--
-      ResolveAssemblyReferenceRazorGenerateInputs may have added the component declaration assembly to RazorReferencePath to perform tag helper discovery.
-      However, we want to compile the Razor assembly against the actual output of the project build i.e. the IntermediateAssembly.
-    -->
-    <ItemGroup>
-      <RazorReferencePath Remove="$(_RazorComponentDeclarationAssemblyFullPath)" />
-      <RazorReferencePath Include="@(IntermediateAssembly->Metadata('FullPath'))" />
     </ItemGroup>
   </Target>
 

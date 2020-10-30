@@ -12,24 +12,19 @@ Copyright (c) .NET Foundation. All rights reserved.
 
 <Project ToolsVersion="14.0">
 
-  <PropertyGroup>
-    <CompileDependsOn>
-      <!--
-        Roslyn allows passing additional metadata to source generators using CompilerVisibleProperty \ CompilerVisibleItemMetadata items. These items
-        are evaluated as part of GenerateMSBuildEditorConfigFile, so do any work to prepare for these to be populated prior to this.
-      -->
-      _PrepareRazorSourceGenerators;
-      $(CompileDependsOn);
-    </CompileDependsOn>
-  </PropertyGroup>
-
-  <Target Name="_PrepareRazorSourceGenerators" DependsOnTargets="PrepareForRazorComponentGenerate">
+  <Target Name="_PrepareRazorSourceGenerators" BeforeTargets="PrepareForBuild" DependsOnTargets="ResolveRazorGenerateInputs;PrepareForRazorComponentGenerate">
     <!-- Configure analyzers -->
     <ItemGroup>
+      <Analyzer Include="D:\work\aspnetcore\artifacts\bin\RazorSourceGenerators\Debug\netstandard2.0\Newtonsoft.Json.dll" />
+      <Analyzer Include="D:\work\aspnetcore\artifacts\bin\RazorSourceGenerators\Debug\netstandard2.0\Microsoft.AspNetCore.Mvc.Razor.Extensions.dll" />
       <Analyzer Include="D:\work\aspnetcore\artifacts\bin\RazorSourceGenerators\Debug\netstandard2.0\Microsoft.AspNetCore.Razor.Language.dll" />
       <Analyzer Include="D:\work\aspnetcore\artifacts\bin\RazorSourceGenerators\Debug\netstandard2.0\Microsoft.CodeAnalysis.Razor.dll" />
       <Analyzer Include="D:\work\aspnetcore\artifacts\bin\RazorSourceGenerators\Debug\netstandard2.0\RazorSourceGenerators.dll" />
     </ItemGroup>
+
+    <PropertyGroup>
+      <_IntermediateOutputFullPath>$(MSBuildProjectDirectory)\$(IntermediateOutputPath)</_IntermediateOutputFullPath>
+    </PropertyGroup>
 
     <ItemGroup>
       <!-- Additional metadata and properties that we want the compiler to pass to   the compiler we want to pass additional MSBuild properties \ metadata -->
@@ -37,6 +32,10 @@ Copyright (c) .NET Foundation. All rights reserved.
       <CompilerVisibleItemMetadata Include="AdditionalFiles" MetadataName="CssScope" />
       <CompilerVisibleProperty Include="RazorLangVersion" />
       <CompilerVisibleProperty Include="RootNamespace" />
+      <CompilerVisibleProperty Include="_IntermediateOutputFullPath" />
+
+      <!-- Indicate to the analyzer where tag helpers need to be stashed away if view compilation is to follow. -->
+      <CompilerVisibleProperty Include="_RazorTagHelperOutputCache" Condition="'@(RazorGenerate->Count())' != '0'" />
     </ItemGroup>
 
     <ItemGroup>

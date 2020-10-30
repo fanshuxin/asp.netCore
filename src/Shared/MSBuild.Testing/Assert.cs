@@ -516,7 +516,11 @@ namespace Microsoft.AspNetCore.Razor.Design.IntegrationTests
             assemblyPath = Path.Combine(result.Project.DirectoryPath, Path.Combine(assemblyPath));
 
             var typeNames = GetDeclaredTypeNames(assemblyPath);
-            Assert.Contains(fullTypeName, typeNames);
+
+            if (!typeNames.Contains(fullTypeName, StringComparer.Ordinal))
+            {
+                throw new MSBuildXunitException(result, $"{fullTypeName} was not found in {string.Join(", ", typeNames)}");
+            }
         }
 
         public static void AssemblyDoesNotContainType(MSBuildResult result, string assemblyPath, string fullTypeName)

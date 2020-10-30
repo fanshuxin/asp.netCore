@@ -66,6 +66,7 @@ Copyright (c) .NET Foundation. All rights reserved.
   <Target Name="RazorCoreCompile"
           Inputs="$(MSBuildAllProjects);
                   @(RazorCompile);
+                  @(RazorGenerate)
                   $(AssemblyOriginatorKeyFile);
                   @(RazorReferencePath);
                   @(CompiledLicenseFile);
@@ -111,10 +112,15 @@ Copyright (c) .NET Foundation. All rights reserved.
       <UseSharedCompilation>true</UseSharedCompilation>
     </PropertyGroup>
 
+    <ItemGroup>
+      <!-- These are RazorSDK specific changes to the compiler task. -->
+      <RazorAdditionalFiles Include="@(RazorGenerateWithTargetPath)" />
+    </ItemGroup>
+
     <Csc
          AdditionalLibPaths="$(AdditionalLibPaths)"
          AddModules="@(AddModules)"
-         AdditionalFiles="@(AdditionalFiles)"
+         AdditionalFiles="@(RazorAdditionalFiles)"
          AllowUnsafeBlocks="$(AllowUnsafeBlocks)"
          Analyzers="@(Analyzer)"
          ApplicationConfiguration="$(AppConfigForCompiler)"

@@ -442,7 +442,13 @@ Microsoft.AspNetCore.Razor.Language.TagHelperDescriptorBuilder.TagHelperDescript
 Microsoft.AspNetCore.Razor.Language.TagHelperDescriptorBuilderExtensions
 Microsoft.AspNetCore.Razor.Language.TagHelperDescriptorExtensions
 Microsoft.AspNetCore.Razor.Language.TagHelperDescriptorProviderContext
+Microsoft.AspNetCore.Razor.Language.TagHelperDescriptorProviderContext.DiscoveryMode.get -> Microsoft.AspNetCore.Razor.Language.TagHelperDiscoveryMode
+Microsoft.AspNetCore.Razor.Language.TagHelperDescriptorProviderContext.DiscoveryMode.set -> void
 Microsoft.AspNetCore.Razor.Language.TagHelperDescriptorProviderContext.TagHelperDescriptorProviderContext() -> void
+Microsoft.AspNetCore.Razor.Language.TagHelperDiscoveryMode
+Microsoft.AspNetCore.Razor.Language.TagHelperDiscoveryMode.All = Microsoft.AspNetCore.Razor.Language.TagHelperDiscoveryMode.CurrentAssembly | Microsoft.AspNetCore.Razor.Language.TagHelperDiscoveryMode.References -> Microsoft.AspNetCore.Razor.Language.TagHelperDiscoveryMode
+Microsoft.AspNetCore.Razor.Language.TagHelperDiscoveryMode.CurrentAssembly = 1 -> Microsoft.AspNetCore.Razor.Language.TagHelperDiscoveryMode
+Microsoft.AspNetCore.Razor.Language.TagHelperDiscoveryMode.References = 2 -> Microsoft.AspNetCore.Razor.Language.TagHelperDiscoveryMode
 Microsoft.AspNetCore.Razor.Language.TagHelperDocumentContext
 Microsoft.AspNetCore.Razor.Language.TagHelperDocumentContext.TagHelperDocumentContext() -> void
 Microsoft.AspNetCore.Razor.Language.TagHelperMetadata

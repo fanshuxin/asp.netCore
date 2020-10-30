@@ -43,32 +43,6 @@ namespace Microsoft.AspNetCore.Razor.Design.IntegrationTests
             }
         }
 
-        [Fact]
-        [InitializeTestProject("MvcWithComponents")]
-        public async Task BuildMvcAppWithComponents()
-        {
-            var result = await DotnetMSBuild(target: default, args: "/clp:PerformanceSummary");
-
-            Assert.BuildPassed(result);
-            var summary = ParseTaskPerformanceSummary(result.Output);
-
-            // One for declaration build, one for the "real" code gen
-            Assert.Equal(2, summary.First(f => f.Name == "RazorGenerate").Calls);
-            Assert.Equal(1, summary.First(f => f.Name == "RazorTagHelper").Calls);
-
-            // Incremental builds
-            for (var i = 0; i < 2; i++)
-            {
-                result = await DotnetMSBuild(target: default, args: "/clp:PerformanceSummary");
-
-                Assert.BuildPassed(result);
-                summary = ParseTaskPerformanceSummary(result.Output);
-
-                Assert.DoesNotContain(summary, item => item.Name == "RazorGenerate");
-                Assert.DoesNotContain(summary, item => item.Name == "RazorTagHelper");
-            }
-        }
-
         private List<PerformanceSummaryEntry> ParseTaskPerformanceSummary(string output)
         {
             const string Header = "Task Performance Summary:";

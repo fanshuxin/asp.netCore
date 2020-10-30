@@ -6,10 +6,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="$(SharedSourceRoot)RazorShared\TagHelperDescriptorJsonConverter.cs" LinkBase="Shared" />
+    <Compile Include="$(SharedSourceRoot)RazorShared\RazorDiagnosticJsonConverter.cs" LinkBase="Shared" />
+    <Compile Include="$(SharedSourceRoot)RazorShared\JsonReaderExtensions.cs" LinkBase="Shared" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="Microsoft.CodeAnalysis.CSharp" PrivateAssets="All" />
+    <Reference Include="Newtonsoft.Json" />
 
     <Reference Include="Microsoft.AspNetCore.Razor.Language" />
     <Reference Include="Microsoft.CodeAnalysis.Razor" />
+    <Reference Include="Microsoft.AspNetCore.Mvc.Razor.Extensions" />
   </ItemGroup>
 
 </Project>

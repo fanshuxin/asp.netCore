@@ -14,7 +14,7 @@ namespace Microsoft.AspNetCore.Razor.Design.IntegrationTests
 #if PRESERVE_WORKING_DIRECTORY
         public bool PreserveWorkingDirectory { get; set; } = true;
 #else
-        public bool PreserveWorkingDirectory { get; set; }
+        public bool PreserveWorkingDirectory { get; set; } = true;
 #endif
 
         public readonly struct ProjectDirectoryOptions

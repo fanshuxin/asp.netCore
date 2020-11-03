@@ -1,13 +1,10 @@
-﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.IO.Pipes;
 using System.Threading;
-using Microsoft.AspNetCore.Razor.Tools;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
@@ -15,12 +12,7 @@ namespace Microsoft.AspNetCore.Razor.Tasks
 {
     public abstract class DotNetToolTask : ToolTask
     {
-        // From https://github.com/dotnet/corefx/blob/29cd6a0b0ac2993cee23ebaf36ca3d4bce6dd75f/src/System.IO.Pipes/ref/System.IO.Pipes.cs#L93.
-        // Using the enum value directly as this option is not available in netstandard.
-        private const PipeOptions PipeOptionCurrentUserOnly = (PipeOptions)536870912;
         private string _dotnetPath;
-
-        private CancellationTokenSource _razorServerCts;
 
         public bool Debug { get; set; }
 
@@ -98,12 +90,6 @@ namespace Microsoft.AspNetCore.Razor.Tasks
 
         protected override int ExecuteTool(string pathToTool, string responseFileCommands, string commandLineCommands)
         {
-            if (UseServer &&
-                TryExecuteOnServer(pathToTool, responseFileCommands, commandLineCommands, out var result))
-            {
-                return result;
-            }
-
             return base.ExecuteTool(pathToTool, responseFileCommands, commandLineCommands);
         }
 
@@ -117,164 +103,6 @@ namespace Microsoft.AspNetCore.Razor.Tasks
             {
                 base.LogToolCommand(message);
             }
-        }
-
-        public override void Cancel()
-        {
-            base.Cancel();
-
-            _razorServerCts?.Cancel();
-        }
-
-        protected virtual bool TryExecuteOnServer(
-            string pathToTool,
-            string responseFileCommands,
-            string commandLineCommands,
-            out int result)
-        {
-#if !NETFRAMEWORK
-            if (!SuppressCurrentUserOnlyPipeOptions && !Enum.IsDefined(typeof(PipeOptions), PipeOptionCurrentUserOnly))
-            {
-                // For security reasons, we don't want to spin up a server that doesn't
-                // restrict requests only to the current user.
-                result = -1;
-
-                return ForceServer;
-            }
-#endif
-
-            Log.LogMessage(StandardOutputLoggingImportance, "Server execution started.");
-            using (_razorServerCts = new CancellationTokenSource())
-            {
-                Log.LogMessage(StandardOutputLoggingImportance, $"CommandLine = '{commandLineCommands}'");
-                Log.LogMessage(StandardOutputLoggingImportance, $"ServerResponseFile = '{responseFileCommands}'");
-
-                // The server contains the tools for discovering tag helpers and generating Razor code.
-                var clientDir = Path.GetFullPath(Path.GetDirectoryName(ToolAssembly));
-                var workingDir = CurrentDirectoryToUse();
-                var tempDir = ServerConnection.GetTempPath(workingDir);
-                var serverPaths = new ServerPaths(
-                    clientDir,
-                    workingDir: workingDir,
-                    tempDir: tempDir);
-
-                var arguments = GetArguments(responseFileCommands);
-
-                var responseTask = ServerConnection.RunOnServer(PipeName, arguments, serverPaths, _razorServerCts.Token, debug: DebugTool);
-                responseTask.Wait(_razorServerCts.Token);
-
-                var response = responseTask.Result;
-                if (response.Type == ServerResponse.ResponseType.Completed &&
-                    response is CompletedServerResponse completedResponse)
-                {
-                    result = completedResponse.ReturnCode;
-
-                    if (result == 0)
-                    {
-                        // Server execution succeeded.
-                        Log.LogMessage(StandardOutputLoggingImportance, $"Server execution completed with return code {result}.");
-
-                        // There might still be warnings in the error output.
-                        if (LogStandardErrorAsError)
-                        {
-                            LogErrors(completedResponse.ErrorOutput);
-                        }
-                        else
-                        {
-                            LogMessages(completedResponse.ErrorOutput, StandardErrorLoggingImportance);
-                        }
-
-                        return true;
-                    }
-                    else if (result == 2)
-                    {
-                        // Server execution completed with a legit error. No need to fallback to cli execution.
-                        Log.LogMessage(StandardOutputLoggingImportance, $"Server execution completed with return code {result}. For more info, check the server log file in the location specified by the RAZORBUILDSERVER_LOG environment variable.");
-
-                        if (LogStandardErrorAsError)
-                        {
-                            LogErrors(completedResponse.ErrorOutput);
-                        }
-                        else
-                        {
-                            LogMessages(completedResponse.ErrorOutput, StandardErrorLoggingImportance);
-                        }
-
-                        return true;
-                    }
-                    else
-                    {
-                        // Server execution completed with an error but we still want to fallback to cli execution.
-                        Log.LogMessage(StandardOutputLoggingImportance, $"Server execution completed with return code {result}. For more info, check the server log file in the location specified by the RAZORBUILDSERVER_LOG environment variable.");
-                    }
-                }
-                else
-                {
-                    // Server execution failed. Fallback to cli execution.
-                    Log.LogMessage(
-                        StandardOutputLoggingImportance,
-                        $"Server execution failed with response {response.Type}. For more info, check the server log file in the location specified by the RAZORBUILDSERVER_LOG environment variable.");
-
-                    result = -1;
-                }
-
-                if (ForceServer)
-                {
-                    // We don't want to fallback to in-process execution.
-                    return true;
-                }
-
-                Log.LogMessage(StandardOutputLoggingImportance, "Fallback to in-process execution.");
-            }
-
-            return false;
-        }
-
-        private void LogMessages(string output, MessageImportance messageImportance)
-        {
-            var lines = output.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
-            foreach (var line in lines)
-            {
-                if (!string.IsNullOrWhiteSpace(line))
-                {
-                    var trimmedMessage = line.Trim();
-                    Log.LogMessageFromText(trimmedMessage, messageImportance);
-                }
-            }
-        }
-
-        private void LogErrors(string output)
-        {
-            var lines = output.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
-            foreach (var line in lines)
-            {
-                if (!string.IsNullOrWhiteSpace(line))
-                {
-                    var trimmedMessage = line.Trim();
-                    Log.LogError(trimmedMessage);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Get the current directory that the compiler should run in.
-        /// </summary>
-        private string CurrentDirectoryToUse()
-        {
-            // ToolTask has a method for this. But it may return null. Use the process directory
-            // if ToolTask didn't override. MSBuild uses the process directory.
-            var workingDirectory = GetWorkingDirectory();
-            if (string.IsNullOrEmpty(workingDirectory))
-            {
-                workingDirectory = Directory.GetCurrentDirectory();
-            }
-            return workingDirectory;
-        }
-
-        private IList<string> GetArguments(string responseFileCommands)
-        {
-            var list = responseFileCommands.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
-            return list;
         }
 
         protected override bool HandleTaskExecutionErrors()

@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Razor.Language;
 
 namespace Microsoft.CodeAnalysis.Razor
 {
-    public partial class ComponentSourceGenerator
+    public partial class RazorSourceGenerator
     {
         private class SetSuppressPrimaryMethodBodyOptionFeature : RazorEngineFeatureBase, IConfigureRazorCodeGenerationOptionsFeature
         {

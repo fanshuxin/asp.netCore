@@ -13,13 +13,17 @@ Copyright (c) .NET Foundation. All rights reserved.
 <Project ToolsVersion="14.0">
 
   <Target Name="_PrepareRazorSourceGenerators" BeforeTargets="PrepareForBuild" DependsOnTargets="ResolveRazorGenerateInputs;PrepareForRazorComponentGenerate">
+    <PropertyGroup>
+      <_RazorSdkSourceGeneratorDirectoryRoot>$(RazorSdkDirectoryRoot)source-generators\</_RazorSdkSourceGeneratorDirectoryRoot>
+    </PropertyGroup>
+    
     <!-- Configure analyzers -->
     <ItemGroup>
-      <Analyzer Include="D:\work\aspnetcore\artifacts\bin\RazorSourceGenerators\Debug\netstandard2.0\Newtonsoft.Json.dll" />
-      <Analyzer Include="D:\work\aspnetcore\artifacts\bin\RazorSourceGenerators\Debug\netstandard2.0\Microsoft.AspNetCore.Mvc.Razor.Extensions.dll" />
-      <Analyzer Include="D:\work\aspnetcore\artifacts\bin\RazorSourceGenerators\Debug\netstandard2.0\Microsoft.AspNetCore.Razor.Language.dll" />
-      <Analyzer Include="D:\work\aspnetcore\artifacts\bin\RazorSourceGenerators\Debug\netstandard2.0\Microsoft.CodeAnalysis.Razor.dll" />
-      <Analyzer Include="D:\work\aspnetcore\artifacts\bin\RazorSourceGenerators\Debug\netstandard2.0\RazorSourceGenerators.dll" />
+      <Analyzer Include="$(_RazorSdkSourceGeneratorDirectoryRoot)Newtonsoft.Json.dll" />
+      <Analyzer Include="$(_RazorSdkSourceGeneratorDirectoryRoot)Microsoft.AspNetCore.Mvc.Razor.Extensions.dll" />
+      <Analyzer Include="$(_RazorSdkSourceGeneratorDirectoryRoot)Microsoft.AspNetCore.Razor.Language.dll" />
+      <Analyzer Include="$(_RazorSdkSourceGeneratorDirectoryRoot)Microsoft.CodeAnalysis.Razor.dll" />
+      <Analyzer Include="$(_RazorSdkSourceGeneratorDirectoryRoot)RazorSourceGenerators.dll" />
     </ItemGroup>
 
     <PropertyGroup>

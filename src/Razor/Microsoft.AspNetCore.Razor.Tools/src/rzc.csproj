@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <Description>Razor is a markup syntax for adding server-side logic to web pages. This assembly contains infrastructure supporting Razor MSBuild integration.</Description>
@@ -17,25 +17,17 @@
 
     <!-- Need to build this project in source build -->
     <ExcludeFromSourceBuild>false</ExcludeFromSourceBuild>
+
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="$(SharedSourceRoot)RazorShared\TagHelperDescriptorJsonConverter.cs">
-      <Link>Shared\TagHelperDescriptorJsonConverter.cs</Link>
-    </Compile>
-    <Compile Include="$(SharedSourceRoot)RazorShared\RazorDiagnosticJsonConverter.cs">
-      <Link>Shared\RazorDiagnosticJsonConverter.cs</Link>
-    </Compile>
-    <Compile Include="$(SharedSourceRoot)RazorShared\JsonReaderExtensions.cs">
-      <Link>Shared\JsonReaderExtensions.cs</Link>
-    </Compile>
     <Compile Include="$(SharedSourceRoot)CommandLineUtils\**\*.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="Microsoft.CodeAnalysis.Razor" />
-    <Reference Include="Microsoft.Css.Parser" />
-    <Reference Include="Newtonsoft.Json" />
+   <Reference Include="Microsoft.Css.Parser" />
+   <Reference Include="Microsoft.CodeAnalysis.Razor"   />
   </ItemGroup>
 
   <!-- This makes it so that the runtimeconfig.json is included as part of the build output of the project that references this project. -->

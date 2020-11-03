@@ -13,7 +13,9 @@ namespace Microsoft.CodeAnalysis.Razor
     {
         public string RootNamespace { get; private set; }
 
-        public List<RazorInputItem> RazorFiles { get; private set; }
+        public IReadOnlyList<RazorInputItem> RazorFiles { get; private set; }
+
+        public IReadOnlyList<RazorInputItem> CshtmlFiles { get; private set; }
 
         public VirtualRazorProjectFileSystem FileSystem { get; private set; }
 
@@ -21,7 +23,7 @@ namespace Microsoft.CodeAnalysis.Razor
 
         public string IntermediateOutputPath { get; private set; }
 
-        public static RazorSourceGenerationContext Create(GeneratorExecutionContext context, string fileExtension)
+        public static RazorSourceGenerationContext Create(GeneratorExecutionContext context)
         {
             var globalOptions = context.AnalyzerConfigOptions.GlobalOptions;
 
@@ -44,25 +46,26 @@ namespace Microsoft.CodeAnalysis.Razor
             }
 
             var razorConfiguration = RazorConfiguration.Create(razorLanguageVersion, configurationName, Enumerable.Empty<RazorExtension>());
-            var razorInputItems = GetRazorInputs(context, fileExtension);
-            var fileSystem = GetVirtualFileSystem(razorInputItems);
+            var (razorFiles, cshtmlFiles) = GetRazorInputs(context);
+            var fileSystem = GetVirtualFileSystem(razorFiles, cshtmlFiles);
 
             return new RazorSourceGenerationContext
             {
                 RootNamespace = rootNamespace,
                 Configuration = razorConfiguration,
                 FileSystem = fileSystem,
-                RazorFiles = razorInputItems,
+                RazorFiles = razorFiles,
+                CshtmlFiles = cshtmlFiles,
                 IntermediateOutputPath = intermediateOutputPath,
             };
         }
 
-        private static VirtualRazorProjectFileSystem GetVirtualFileSystem(List<RazorInputItem> razorInputItems)
+        private static VirtualRazorProjectFileSystem GetVirtualFileSystem(IReadOnlyList<RazorInputItem> razorFiles, IReadOnlyList<RazorInputItem> cshtmlFiles)
         {
             var fileSystem = new VirtualRazorProjectFileSystem();
-            for (var i = 0; i < razorInputItems.Count; i++)
+            for (var i = 0; i < razorFiles.Count; i++)
             {
-                var item = razorInputItems[i];
+                var item = razorFiles[i];
                 fileSystem.Add(new DefaultRazorProjectItem(
                     basePath: "/",
                     filePath: item.NormalizedPath,
@@ -72,16 +75,37 @@ namespace Microsoft.CodeAnalysis.Razor
                     cssScope: item.CssScope));
             }
 
+            for (var i = 0; i < cshtmlFiles.Count; i++)
+            {
+                var item = cshtmlFiles[i];
+                fileSystem.Add(new DefaultRazorProjectItem(
+                    basePath: "/",
+                    filePath: item.NormalizedPath,
+                    relativePhysicalPath: item.RelativePath,
+                    fileKind: FileKinds.Legacy,
+                    file: new FileInfo(item.FullPath),
+                    cssScope: item.CssScope));
+            }
+
             return fileSystem;
         }
 
-        private static List<RazorInputItem> GetRazorInputs(GeneratorExecutionContext context, string fileExtension)
+        private static (IReadOnlyList<RazorInputItem> razorFiles, IReadOnlyList<RazorInputItem> cshtmlFiles) GetRazorInputs(GeneratorExecutionContext context)
         {
-            var isComponent = fileExtension == ".razor";
+            List<RazorInputItem> razorFiles = null;
+            List<RazorInputItem> cshtmlFiles = null;
 
-            var razorItems = new List<RazorInputItem>();
-            foreach (var item in context.AdditionalFiles.Where(f => f.Path.EndsWith(fileExtension, StringComparison.OrdinalIgnoreCase)))
+            foreach (var item in context.AdditionalFiles)
             {
+                var path = item.Path;
+                var isComponent = path.EndsWith(".razor", StringComparison.OrdinalIgnoreCase);
+                var isRazorView = !isComponent && path.EndsWith(".cshtml", StringComparison.OrdinalIgnoreCase);
+
+                if (!isComponent && !isRazorView)
+                {
+                    continue;
+                }
+
                 var options = context.AnalyzerConfigOptions.GetOptions(item);
                 if (!options.TryGetValue("build_metadata.AdditionalFiles.TargetPath", out var relativePath))
                 {
@@ -90,10 +114,22 @@ namespace Microsoft.CodeAnalysis.Razor
 
                 var fileKind = isComponent ? FileKinds.GetComponentFileKindFromFilePath(item.Path) : FileKinds.Legacy;
 
-                razorItems.Add(new RazorInputItem(item.Path, relativePath, fileKind));
+                if (isComponent)
+                {
+                    razorFiles ??= new();
+                    razorFiles.Add(new RazorInputItem(item.Path, relativePath, fileKind));
+                }
+                else
+                {
+                    cshtmlFiles ??= new();
+                    cshtmlFiles.Add(new RazorInputItem(item.Path, relativePath, fileKind));
+                }
             }
 
-            return razorItems;
+            return (
+                (IReadOnlyList<RazorInputItem>)razorFiles ?? Array.Empty<RazorInputItem>(),
+                (IReadOnlyList<RazorInputItem>)cshtmlFiles ?? Array.Empty<RazorInputItem>()
+            );
         }
 
     }

@@ -15,16 +15,10 @@ namespace Microsoft.AspNetCore.Razor.Tools
     {
         public Application(
             CancellationToken cancellationToken,
-            ExtensionAssemblyLoader loader,
-            ExtensionDependencyChecker checker,
-            Func<string, MetadataReferenceProperties, PortableExecutableReference> assemblyReferenceProvider,
             TextWriter output = null,
             TextWriter error = null)
         {
             CancellationToken = cancellationToken;
-            Checker = checker;
-            Loader = loader;
-            AssemblyReferenceProvider = assemblyReferenceProvider;
             Out = output ?? Out;
             Error = error ?? Error;
 
@@ -35,21 +29,11 @@ namespace Microsoft.AspNetCore.Razor.Tools
 
             HelpOption("-?|-h|--help");
 
-            Commands.Add(new ServerCommand(this));
-            Commands.Add(new ShutdownCommand(this));
-            Commands.Add(new DiscoverCommand(this));
-            Commands.Add(new GenerateCommand(this));
             Commands.Add(new BrotliCompressCommand(this));
             Commands.Add(new RewriteCssCommand(this));
         }
 
         public CancellationToken CancellationToken { get; }
-
-        public ExtensionAssemblyLoader Loader { get; }
-
-        public ExtensionDependencyChecker Checker { get; }
-
-        public Func<string, MetadataReferenceProperties, PortableExecutableReference> AssemblyReferenceProvider { get; }
 
         public new int Execute(params string[] args)
         {

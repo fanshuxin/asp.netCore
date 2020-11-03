@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Razor.Extensions;
 using Microsoft.AspNetCore.Razor.Language;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
@@ -19,9 +20,10 @@ namespace Microsoft.CodeAnalysis.Razor
     /// This source generator performs two operations
     /// * Discovers tag helpers
     /// * Code gens any component files and adds them to the compilation.
+    /// * Code gens any razor views and writes them to disk.
     /// </summary>
     [Generator]
-    public partial class ComponentSourceGenerator : ISourceGenerator
+    public partial class RazorSourceGenerator : ISourceGenerator
     {
         public void Initialize(GeneratorInitializationContext context)
         {
@@ -34,7 +36,7 @@ namespace Microsoft.CodeAnalysis.Razor
                 return;
             }
 
-            var razorContext = RazorSourceGenerationContext.Create(context, ".razor");
+            var razorContext = RazorSourceGenerationContext.Create(context);
 
             // TagHelpers are used by both components and views. Always discover them.
             var tagHelpers = ResolveTagHelperDescriptors(context, razorContext);
@@ -44,11 +46,6 @@ namespace Microsoft.CodeAnalysis.Razor
                 return;
             }
 
-            CodeGenerateRazorComponents(context, razorContext, tagHelpers);
-        }
-
-        private static void CodeGenerateRazorComponents(GeneratorExecutionContext context, RazorSourceGenerationContext razorContext, IReadOnlyList<TagHelperDescriptor> tagHelpers)
-        {
             var projectEngine = RazorProjectEngine.Create(razorContext.Configuration, razorContext.FileSystem, b =>
             {
                 b.Features.Add(new DefaultTypeNameFeature());
@@ -58,12 +55,41 @@ namespace Microsoft.CodeAnalysis.Razor
                 b.Features.Add(new DefaultTagHelperDescriptorProvider());
 
                 CompilerFeatures.Register(b);
+                RazorExtensions.Register(b);
 
                 b.SetCSharpLanguageVersion(((CSharpParseOptions)context.ParseOptions).LanguageVersion);
             });
 
-            var files = razorContext.RazorFiles;
+            CodeGenerateRazorComponents(context, razorContext, projectEngine);
+            GenerateViews(context, razorContext, projectEngine);
+        }
+
+        private void GenerateViews(GeneratorExecutionContext context, RazorSourceGenerationContext razorContext, RazorProjectEngine projectEngine)
+        {
+            var files = razorContext.CshtmlFiles;
+            Parallel.For(0, files.Count, i =>
+            {
+                var file = files[i];
+
+                var codeDocument = projectEngine.Process(projectEngine.FileSystem.GetItem(file.NormalizedPath, FileKinds.Legacy));
+                var csharpDocument = codeDocument.GetCSharpDocument();
+                for (var j = 0; j < csharpDocument.Diagnostics.Count; j++)
+                {
+                    var razorDiagnostic = csharpDocument.Diagnostics[j];
+                    var csharpDiagnostic = razorDiagnostic.AsDiagnostic();
+                    context.ReportDiagnostic(csharpDiagnostic);
+                }
+
+                var hint = GetIdentifierFromPath(file.NormalizedPath);
+
+                context.AddSource(hint, SourceText.From(codeDocument.GetCSharpDocument().GeneratedCode, Encoding.UTF8));
+            });
+        }
+
+        private static void CodeGenerateRazorComponents(GeneratorExecutionContext context, RazorSourceGenerationContext razorContext, RazorProjectEngine projectEngine)
+        {
             var contextLock = new object();
+            var files = razorContext.RazorFiles;
 
             Parallel.For(0, files.Count, i =>
             {

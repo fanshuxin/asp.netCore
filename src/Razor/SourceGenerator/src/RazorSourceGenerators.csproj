@@ -3,6 +3,14 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+
+    <!-- This is not a package, it is part of Razor SDK. -->
+    <IsPackable>false</IsPackable>
+    <IsShipping>false</IsShipping>
+    <EnableApiCheck>false</EnableApiCheck>
+
+    <!-- Need to build this project in source build -->
+    <ExcludeFromSourceBuild>false</ExcludeFromSourceBuild>
   </PropertyGroup>
 
   <ItemGroup>

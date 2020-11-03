@@ -25,30 +25,22 @@
     <Reference Include="System.Reflection.Metadata"  Condition="'$(TargetFramework)'=='net46'" />
 
     <Reference Include="rzc"
-      Targets="Publish"
       ReferenceOutputAssembly="false"
       SkipGetTargetFrameworkProperties="true"
-      UndefineProperties="TargetFramework;TargetFrameworks;RuntimeIdentifier;PublishDir;SelfContained" />
+      UndefineProperties="TargetFramework;TargetFrameworks" />
 
     <Reference Include="Microsoft.AspNetCore.Mvc.Razor.Extensions"
+      ReferenceOutputAssembly="false"
+      SkipGetTargetFrameworkProperties="true"
+      UndefineProperties="TargetFramework;TargetFrameworks" />
+
+    <Reference Include="RazorSourceGenerators"
       ReferenceOutputAssembly="false"
       SkipGetTargetFrameworkProperties="true"
       UndefineProperties="TargetFramework;TargetFrameworks" />
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\..\Microsoft.AspNetCore.Razor.Tools\src\ServerProtocol\*.cs">
-      <Link>Shared\ServerProtocol\%(FileName)</Link>
-    </Compile>
-    <Compile Include="..\..\Microsoft.AspNetCore.Razor.Tools\src\PipeName.cs">
-      <Link>Shared\PipeName.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Microsoft.AspNetCore.Razor.Tools\src\MutexName.cs">
-      <Link>Shared\MutexName.cs</Link>
-    </Compile>
-    <Compile Include="..\..\Microsoft.AspNetCore.Razor.Tools\src\Client.cs">
-      <Link>Shared\Client.cs</Link>
-    </Compile>
     <Compile Include="$(SharedSourceRoot)CommandLineUtils\Utilities\ArgumentEscaper.cs" />
 
     <Content Include="_._" CopyToOutputDirectory="PreserveNewest" />
@@ -58,31 +50,21 @@
     Condition="'$(IsInnerBuild)' != 'true' AND '$(NoBuild)' != 'true'">
     <!-- Layout tasks, compiler, and extensions in the sdk-output folder. The entire folder structure gets packaged as-is into the SDK -->
 
-    <PropertyGroup Condition="'$(ContinuousIntegrationBuild)' != 'true'">
-      <_ContinueOnError>true</_ContinueOnError>
-      <_Retries>1</_Retries>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(ContinuousIntegrationBuild)' == 'true'">
-      <_ContinueOnError>false</_ContinueOnError>
-      <_Retries>10</_Retries>
-    </PropertyGroup>
-
     <ItemGroup>
-      <RazorToolsOutput Include="$(ArtifactsBinDir)rzc\$(Configuration)\$(DefaultNetCoreTargetFramework)\publish\**\*.*" />
-      <MvcRazorExtensionOutput Include="$(ArtifactsBinDir)Microsoft.AspNetCore.Mvc.Razor.Extensions\$(Configuration)\netstandard2.0\Microsoft.AspNetCore.Mvc.Razor.Extensions.dll" />
+      <RazorToolsOutput Include="$(ArtifactsBinDir)rzc\$(Configuration)\$(DefaultNetCoreTargetFramework)\*" />
+      <RazorSourceGeneratorOutput Include="$(ArtifactsBinDir)RazorSourceGenerators\$(Configuration)\netstandard2.0\*" />
     </ItemGroup>
 
     <Error
-      Text="rzc outputs were not found in $(ArtifactsBinDir)rzc\$(Configuration)\$(DefaultNetCoreTargetFramework)\publish"
+      Text="rzc outputs were not found in $(ArtifactsBinDir)rzc\$(Configuration)\$(DefaultNetCoreTargetFramework)"
       Condition="'@(RazorToolsOutput->Count())' == '0'" />
 
     <Error
-      Text="Mvc extensions outputs were not found in $(ArtifactsBinDir)Microsoft.AspNetCore.Mvc.Razor.Extensions\$(Configuration)\netstandard2.0"
-      Condition="'@(MvcRazorExtensionOutput->Count())' == '0'" />
+      Text="Source generator output were not found in $(ArtifactsBinDir)RazorSourceGenerators\$(Configuration)\netstandard2.0\"
+      Condition="'@(RazorSourceGeneratorOutput->Count())' == '0'" />
 
-    <Copy SourceFiles="@(RazorToolsOutput)" DestinationFolder="$(SdkOutputPath)tools\" SkipUnchangedFiles="true" Retries="$(_Retries)" ContinueOnError="$(_ContinueOnError)" />
-    <Copy SourceFiles="@(MvcRazorExtensionOutput)" DestinationFolder="$(SdkOutputPath)extensions\mvc-3-0\" SkipUnchangedFiles="true" Retries="$(_Retries)" ContinueOnError="$(_ContinueOnError)">
+    <Copy SourceFiles="@(RazorToolsOutput)" DestinationFolder="$(SdkOutputPath)tools\" SkipUnchangedFiles="true" Retries="1" ContinueOnError="true" />
+    <Copy SourceFiles="@(RazorSourceGeneratorOutput)" DestinationFolder="$(SdkOutputPath)source-generators\" SkipUnchangedFiles="true" Retries="1" ContinueOnError="true">
       <Output TaskParameter="CopiedFiles" ItemName="FileWrites" />
     </Copy>
 
@@ -94,7 +76,7 @@
       <ProjectOutput Include="$(ArtifactsBinDir)Microsoft.NET.Sdk.Razor\$(Configuration)\net46*\System.Reflection.Metadata.dll" />
     </ItemGroup>
 
-    <Copy SourceFiles="@(ProjectOutput)" DestinationFiles="$(SdkOutputPath)tasks\%(RecursiveDir)%(FileName)%(Extension)" SkipUnchangedFiles="true" Retries="$(_Retries)" ContinueOnError="$(_ContinueOnError)">
+    <Copy SourceFiles="@(ProjectOutput)" DestinationFiles="$(SdkOutputPath)tasks\%(RecursiveDir)%(FileName)%(Extension)" SkipUnchangedFiles="true" Retries="1" ContinueOnError="true">
       <Output TaskParameter="CopiedFiles" ItemName="FileWrites" />
     </Copy>
 

@@ -25,6 +25,8 @@ namespace Microsoft.CodeAnalysis.Razor
     [Generator]
     public partial class RazorSourceGenerator : ISourceGenerator
     {
+        private static bool RazorDisableCache;
+
         public void Initialize(GeneratorInitializationContext context)
         {
         }
@@ -35,6 +37,8 @@ namespace Microsoft.CodeAnalysis.Razor
             {
                 return;
             }
+
+            RazorDisableCache = context.AnalyzerConfigOptions.GlobalOptions.TryGetValue("build_property.RazorSourceGenDisableCache", out var value) && value == "true";
 
             var razorContext = RazorSourceGenerationContext.Create(context);
 
@@ -144,7 +148,7 @@ namespace Microsoft.CodeAnalysis.Razor
             {
                 var file = files[i];
                 var outputPath = Path.Combine(declarationFolder, file.RelativePath);
-                if (File.GetLastWriteTimeUtc(outputPath) > File.GetLastWriteTimeUtc(file.FullPath))
+                if (!RazorDisableCache && File.GetLastWriteTimeUtc(outputPath) > File.GetLastWriteTimeUtc(file.FullPath))
                 {
                     // Declaration files are invariant to other razor files, tag helpers, assemblies. If we have previously generated
                     // content that it's still newer than the output file, use it and save time processing the file.
@@ -164,11 +168,10 @@ namespace Microsoft.CodeAnalysis.Razor
             tagHelperFeature.Compilation = executionContext.Compilation.AddSyntaxTrees(results.Take(files.Count));
             ArrayPool<SyntaxTree>.Shared.Return(results);
 
-            var lastUpdatedReferenceUtc = GetLastUpdatedReference(executionContext.Compilation.References);
             var tagHelperRefsOutputCache = Path.Combine(razorContext.IntermediateOutputPath, TagHelperSerializer.ReferenceAssemblyTagHelpersOutputPath);
             IReadOnlyList<TagHelperDescriptor> refTagHelpers;
 
-            if (lastUpdatedReferenceUtc < File.GetLastWriteTimeUtc(tagHelperRefsOutputCache))
+            if (!RazorDisableCache && GetLastUpdatedReference(executionContext.Compilation.References) < File.GetLastWriteTimeUtc(tagHelperRefsOutputCache))
             {
                 // Producing tag helpers from a Compilation every time is surprisingly expensive. So we'll use some caching strategies to mitigate this until
                 // we can improve the perf in that area.

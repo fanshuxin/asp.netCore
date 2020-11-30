@@ -1,0 +1,3 @@
+#nullable enable
+Microsoft.AspNetCore.Mvc.MvcOptions.EnableActionInvokers.get -> bool
+Microsoft.AspNetCore.Mvc.MvcOptions.EnableActionInvokers.set -> void

@@ -1,4 +1,5 @@
 #nullable enable
+*REMOVED*~Microsoft.AspNetCore.Testing.QuarantinedTestAttribute.QuarantinedTestAttribute(string reason = null) -> void
 ~Microsoft.AspNetCore.Testing.QuarantinedTestAttribute.QuarantinedTestAttribute(string reason) -> void
 Microsoft.AspNetCore.Testing.HelixConstants
 ~const Microsoft.AspNetCore.Testing.HelixConstants.Windows10Arm64 = "Windows.10.Arm64v8.Open;" -> string

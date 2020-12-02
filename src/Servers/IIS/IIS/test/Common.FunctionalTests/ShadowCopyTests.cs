@@ -164,9 +164,10 @@ namespace Microsoft.AspNetCore.Server.IIS.FunctionalTests
             File.WriteAllBytes(dllPath, fileContents);
 
             // verify app is restarted.
-            // TODO disable for IISExpress?
-            await deploymentResult.HttpClient.GetStringAsync("Wow!");
-            EventLogHelpers.VerifyEventLogEvent(deploymentResult, EventLogHelpers.InProcessShutdown(), Logger);
+            var response = await deploymentResult.HttpClient.GetAsync("Wow!");
+            Assert.False(response.IsSuccessStatusCode);
+            StopServer();
+            EventLogHelpers.VerifyEventLogEvent(deploymentResult, EventLogHelpers.ShutdownFileChange(deploymentResult), Logger);
         }
 
         [ConditionalFact]
@@ -176,7 +177,6 @@ namespace Microsoft.AspNetCore.Server.IIS.FunctionalTests
             var deploymentParameters = Fixture.GetBaseDeploymentParameters();
             deploymentParameters.HandlerSettings["enableShadowCopy"] = "true";
             deploymentParameters.HandlerSettings["shadowCopyDirectory"] = directory.FullName;
-            //deploymentParameters.ApplicationPath = directory.FullName;
             var deploymentResult = await DeployAsync(deploymentParameters);
 
             DirectoryCopy(deploymentResult.ContentRoot, directory.FullName, copySubDirs: true);
@@ -189,10 +189,10 @@ namespace Microsoft.AspNetCore.Server.IIS.FunctionalTests
             DirectoryCopy(deploymentResult.ContentRoot, secondTempDir.FullName, copySubDirs: true);
             DirectoryCopy(secondTempDir.FullName, deploymentResult.ContentRoot, copySubDirs: true);
 
-            // verify app is restarted.
-            await Task.Delay(60000);
-            await deploymentResult.HttpClient.GetStringAsync("Wow!");
-            EventLogHelpers.VerifyEventLogEvent(deploymentResult, EventLogHelpers.InProcessShutdown(), Logger);
+            var response = await deploymentResult.HttpClient.GetAsync("Wow!");
+            Assert.False(response.IsSuccessStatusCode);
+            StopServer();
+            EventLogHelpers.VerifyEventLogEvent(deploymentResult, EventLogHelpers.ShutdownFileChange(deploymentResult), Logger);
         }
 
         protected static DirectoryInfo CreateTempDirectory()

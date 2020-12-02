@@ -29,7 +29,6 @@ void AppOfflineTrackingApplication::StopInternal(bool fServerInitiated)
 
     if (m_fileWatcher)
     {
-        // want to wait for that thread to exit?
         m_fileWatcher->StopMonitor();
         m_fileWatcher = nullptr;
     }

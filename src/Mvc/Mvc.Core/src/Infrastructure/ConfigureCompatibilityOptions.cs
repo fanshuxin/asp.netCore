@@ -33,7 +33,9 @@ namespace Microsoft.AspNetCore.Mvc.Infrastructure
                 throw new ArgumentNullException(nameof(loggerFactory));
             }
 
+#pragma warning disable CS0618
             Version = compatibilityOptions.Value.CompatibilityVersion;
+#pragma warning restore CS0618
             _logger = loggerFactory.CreateLogger<TOptions>();
         }
 
@@ -46,6 +48,7 @@ namespace Microsoft.AspNetCore.Mvc.Infrastructure
         /// <summary>
         /// Gets the <see cref="CompatibilityVersion"/> configured for the application.
         /// </summary>
+        [Obsolete("This value is obsolete.")] // Remove after .NET 6.
         protected CompatibilityVersion Version { get; }
 
         /// <inheritdoc />
@@ -84,22 +87,26 @@ namespace Microsoft.AspNetCore.Mvc.Infrastructure
 
             if (!defaultValues.TryGetValue(@switch.Name, out var value))
             {
+#pragma warning disable CS0618 // Type or member is obsolete
                 _logger.LogDebug(
                     "Compatibility switch {SwitchName} in type {OptionsType} is using default value {Value}",
                     @switch.Name,
                     typeof(TOptions).Name,
                     @switch.Value,
                     Version);
+#pragma warning restore CS0618
                 return;
             }
 
             @switch.Value = value;
+#pragma warning disable CS0618 // Type or member is obsolete
             _logger.LogDebug(
                 "Compatibility switch {SwitchName} in type {OptionsType} is using compatibility value {Value} for version {Version}",
                 @switch.Name,
                 typeof(TOptions).Name,
                 @switch.Value,
                 Version);
+#pragma warning restore CS0618
         }
     }
 }

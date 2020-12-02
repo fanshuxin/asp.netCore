@@ -16,7 +16,9 @@ namespace FilesWebSite
         {
             services.AddControllers()
                 .AddNewtonsoftJson()
+#pragma warning disable CS0618
                 .SetCompatibilityVersion(CompatibilityVersion.Latest);
+#pragma warning restore CS0618
         }
 
         public void Configure(IApplicationBuilder app)

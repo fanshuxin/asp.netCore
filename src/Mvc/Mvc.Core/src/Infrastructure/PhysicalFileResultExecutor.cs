@@ -108,26 +108,6 @@ namespace Microsoft.AspNetCore.Mvc.Infrastructure
         }
 
         /// <summary>
-        /// Obsolete. This API is no longer called.
-        /// </summary>
-        [Obsolete("This API is no longer called.")]
-        protected virtual Stream GetFileStream(string path)
-        {
-            if (path == null)
-            {
-                throw new ArgumentNullException(nameof(path));
-            }
-
-            return new FileStream(
-                    path,
-                    FileMode.Open,
-                    FileAccess.Read,
-                    FileShare.ReadWrite,
-                    BufferSize,
-                    FileOptions.Asynchronous | FileOptions.SequentialScan);
-        }
-
-        /// <summary>
         /// Get the file metadata for a path.
         /// </summary>
         /// <param name="path">The file path.</param>

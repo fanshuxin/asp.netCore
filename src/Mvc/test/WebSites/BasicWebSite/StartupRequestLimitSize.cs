@@ -18,7 +18,9 @@ namespace BasicWebSite
         {
             services.AddMvc()
                 .AddNewtonsoftJson()
+#pragma warning disable CS0618
                 .SetCompatibilityVersion(CompatibilityVersion.Latest);
+#pragma warning restore CS0618
             services.ConfigureBaseWebSiteAuthPolicies();
         }
 

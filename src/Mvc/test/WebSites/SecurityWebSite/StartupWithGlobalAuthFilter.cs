@@ -36,7 +36,9 @@ namespace SecurityWebSite
                 options.Conventions.AllowAnonymousToPage("/AllowAnonymousPageViaConvention");
                 options.Conventions.AuthorizePage("/AuthorizePageViaConvention", "RequireClaimB");
             })
+#pragma warning disable CS0618
             .SetCompatibilityVersion(CompatibilityVersion.Latest);
+#pragma warning restore CS0618
         }
 
         public void Configure(IApplicationBuilder app)

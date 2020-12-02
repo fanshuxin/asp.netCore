@@ -9,7 +9,6 @@ Microsoft.AspNetCore.Mvc.Razor.Compilation.CompiledViewDescriptor
 Microsoft.AspNetCore.Mvc.Razor.Compilation.CompiledViewDescriptor.CompiledViewDescriptor() -> void
 Microsoft.AspNetCore.Mvc.Razor.Compilation.IViewCompiler
 Microsoft.AspNetCore.Mvc.Razor.Compilation.IViewCompilerProvider
-Microsoft.AspNetCore.Mvc.Razor.Compilation.RazorViewAttribute
 Microsoft.AspNetCore.Mvc.Razor.Compilation.ViewsFeature
 Microsoft.AspNetCore.Mvc.Razor.Compilation.ViewsFeature.ViewsFeature() -> void
 Microsoft.AspNetCore.Mvc.Razor.HelperResult
@@ -90,7 +89,6 @@ virtual Microsoft.AspNetCore.Mvc.Razor.RazorPageBase.EndWriteAttribute() -> void
 ~Microsoft.AspNetCore.Mvc.Diagnostics.BeforeViewPageEventData.Page.get -> Microsoft.AspNetCore.Mvc.Razor.IRazorPage
 ~Microsoft.AspNetCore.Mvc.Diagnostics.BeforeViewPageEventData.ViewContext.get -> Microsoft.AspNetCore.Mvc.Rendering.ViewContext
 ~Microsoft.AspNetCore.Mvc.Razor.Compilation.CompiledViewDescriptor.CompiledViewDescriptor(Microsoft.AspNetCore.Razor.Hosting.RazorCompiledItem item) -> void
-~Microsoft.AspNetCore.Mvc.Razor.Compilation.CompiledViewDescriptor.CompiledViewDescriptor(Microsoft.AspNetCore.Razor.Hosting.RazorCompiledItem item, Microsoft.AspNetCore.Mvc.Razor.Compilation.RazorViewAttribute attribute) -> void
 ~Microsoft.AspNetCore.Mvc.Razor.Compilation.CompiledViewDescriptor.ExpirationTokens.get -> System.Collections.Generic.IList<Microsoft.Extensions.Primitives.IChangeToken>
 ~Microsoft.AspNetCore.Mvc.Razor.Compilation.CompiledViewDescriptor.ExpirationTokens.set -> void
 ~Microsoft.AspNetCore.Mvc.Razor.Compilation.CompiledViewDescriptor.Item.get -> Microsoft.AspNetCore.Razor.Hosting.RazorCompiledItem
@@ -98,13 +96,8 @@ virtual Microsoft.AspNetCore.Mvc.Razor.RazorPageBase.EndWriteAttribute() -> void
 ~Microsoft.AspNetCore.Mvc.Razor.Compilation.CompiledViewDescriptor.RelativePath.get -> string
 ~Microsoft.AspNetCore.Mvc.Razor.Compilation.CompiledViewDescriptor.RelativePath.set -> void
 ~Microsoft.AspNetCore.Mvc.Razor.Compilation.CompiledViewDescriptor.Type.get -> System.Type
-~Microsoft.AspNetCore.Mvc.Razor.Compilation.CompiledViewDescriptor.ViewAttribute.get -> Microsoft.AspNetCore.Mvc.Razor.Compilation.RazorViewAttribute
-~Microsoft.AspNetCore.Mvc.Razor.Compilation.CompiledViewDescriptor.ViewAttribute.set -> void
 ~Microsoft.AspNetCore.Mvc.Razor.Compilation.IViewCompiler.CompileAsync(string relativePath) -> System.Threading.Tasks.Task<Microsoft.AspNetCore.Mvc.Razor.Compilation.CompiledViewDescriptor>
 ~Microsoft.AspNetCore.Mvc.Razor.Compilation.IViewCompilerProvider.GetCompiler() -> Microsoft.AspNetCore.Mvc.Razor.Compilation.IViewCompiler
-~Microsoft.AspNetCore.Mvc.Razor.Compilation.RazorViewAttribute.Path.get -> string
-~Microsoft.AspNetCore.Mvc.Razor.Compilation.RazorViewAttribute.RazorViewAttribute(string path, System.Type viewType) -> void
-~Microsoft.AspNetCore.Mvc.Razor.Compilation.RazorViewAttribute.ViewType.get -> System.Type
 ~Microsoft.AspNetCore.Mvc.Razor.Compilation.ViewsFeature.ViewDescriptors.get -> System.Collections.Generic.IList<Microsoft.AspNetCore.Mvc.Razor.Compilation.CompiledViewDescriptor>
 ~Microsoft.AspNetCore.Mvc.Razor.HelperResult.HelperResult(System.Func<System.IO.TextWriter, System.Threading.Tasks.Task> asyncAction) -> void
 ~Microsoft.AspNetCore.Mvc.Razor.HelperResult.WriteAction.get -> System.Func<System.IO.TextWriter, System.Threading.Tasks.Task>

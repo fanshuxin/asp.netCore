@@ -17,7 +17,9 @@ public class Startup
         services.AddScoped<List<DataA>>(_ => DataA);
         services.AddScoped<List<DataB>>(_ => DataB);
         services.AddMvc()
+#pragma warning disable CS0618
             .SetCompatibilityVersion(CompatibilityVersion.Latest);
+#pragma warning restore CS0618
     }
 
     public void Configure(IApplicationBuilder app, IHostingEnvironment env)

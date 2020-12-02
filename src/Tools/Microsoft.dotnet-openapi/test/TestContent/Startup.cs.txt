@@ -20,7 +20,9 @@ namespace SimpleWebSite
                 .AddMvcCore()
                 .AddAuthorization()
                 .AddFormatterMappings(m => m.SetMediaTypeMappingForFormat("js", new MediaTypeHeaderValue("application/json")))
+#pragma warning disable CS0618
                 .SetCompatibilityVersion(CompatibilityVersion.Latest);
+#pragma warning restore CS0618
         }
 
         public void Configure(IApplicationBuilder app)

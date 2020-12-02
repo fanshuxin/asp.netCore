@@ -254,7 +254,9 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="builder">The <see cref="IMvcCoreBuilder"/>.</param>
         /// <param name="version">The <see cref="CompatibilityVersion"/> value to configure.</param>
         /// <returns>The <see cref="IMvcCoreBuilder"/>.</returns>
+#pragma warning disable CS0618
         public static IMvcCoreBuilder SetCompatibilityVersion(this IMvcCoreBuilder builder, CompatibilityVersion version)
+#pragma warning restore CS0618
         {
             if (builder == null)
             {

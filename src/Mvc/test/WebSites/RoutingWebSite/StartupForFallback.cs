@@ -17,7 +17,9 @@ namespace RoutingWebSite
             services
                 .AddMvc()
                 .AddNewtonsoftJson()
+#pragma warning disable CS0618
                 .SetCompatibilityVersion(CompatibilityVersion.Latest);
+#pragma warning restore CS0618
 
             // Used by some controllers defined in this project.
             services.Configure<RouteOptions>(options => options.ConstraintMap["slugify"] = typeof(SlugifyParameterTransformer));

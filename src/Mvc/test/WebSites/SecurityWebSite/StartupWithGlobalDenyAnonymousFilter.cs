@@ -26,7 +26,9 @@ namespace SecurityWebSite
             {
                 o.Filters.Add(new AuthorizeFilter());
             })
+#pragma warning disable CS0618
             .SetCompatibilityVersion(CompatibilityVersion.Latest);
+#pragma warning restore CS0618
 
             services.AddScoped<IPolicyEvaluator, CountingPolicyEvaluator>();
         }

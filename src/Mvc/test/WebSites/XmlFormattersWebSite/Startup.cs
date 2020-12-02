@@ -13,7 +13,9 @@ namespace XmlFormattersWebSite
 {
     public class Startup
     {
+#pragma warning disable CS0618
         public virtual CompatibilityVersion CompatibilityVersion => CompatibilityVersion.Latest;
+#pragma warning restore CS0618
 
         // Set up application services
         public void ConfigureServices(IServiceCollection services)

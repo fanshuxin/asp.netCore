@@ -14,7 +14,9 @@ namespace VersioningWebSite
         {
             services.AddControllers(ConfigureMvcOptions)
                 .AddNewtonsoftJson()
+#pragma warning disable CS0618
                 .SetCompatibilityVersion(CompatibilityVersion.Latest);
+#pragma warning restore CS0618
 
             services.AddScoped<TestResponseGenerator>();
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();

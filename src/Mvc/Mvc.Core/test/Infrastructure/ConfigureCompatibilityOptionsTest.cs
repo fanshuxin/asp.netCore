@@ -16,7 +16,9 @@ namespace Microsoft.AspNetCore.Mvc.Infrastructure
         public void PostConfigure_NoValueForProperty_DoesNothing()
         {
             // Arrange
+#pragma warning disable CS0618
             var configure = Create(CompatibilityVersion.Version_3_0, new Dictionary<string, object>());
+#pragma warning restore CS0618
 
             var options = new TestOptions();
 
@@ -31,12 +33,14 @@ namespace Microsoft.AspNetCore.Mvc.Infrastructure
         public void PostConfigure_ValueIsSet_DoesNothing()
         {
             // Arrange
+#pragma warning disable CS0618
             var configure = Create(
                 CompatibilityVersion.Version_3_0,
                 new Dictionary<string, object>
                 {
                     { nameof(TestOptions.TestProperty), true },
                 });
+#pragma warning restore CS0618
 
             var options = new TestOptions()
             {
@@ -54,12 +58,14 @@ namespace Microsoft.AspNetCore.Mvc.Infrastructure
         public void PostConfigure_ValueNotSet_SetsValue()
         {
             // Arrange
+#pragma warning disable CS0618
             var configure = Create(
                 CompatibilityVersion.Version_3_0,
                 new Dictionary<string, object>
                 {
                     { nameof(TestOptions.TestProperty), true },
                 });
+#pragma warning restore CS0618
 
             var options = new TestOptions();
 
@@ -71,7 +77,9 @@ namespace Microsoft.AspNetCore.Mvc.Infrastructure
         }
 
         private static ConfigureCompatibilityOptions<TestOptions> Create(
+#pragma warning disable CS0618
             CompatibilityVersion version,
+#pragma warning restore CS0618
             IReadOnlyDictionary<string, object> defaultValues)
         {
             var compatibilityOptions = Options.Create(new MvcCompatibilityOptions() { CompatibilityVersion = version });

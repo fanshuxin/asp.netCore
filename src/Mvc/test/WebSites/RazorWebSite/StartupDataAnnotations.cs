@@ -25,7 +25,9 @@ namespace RazorWebSite
                     options.DataAnnotationLocalizerProvider =
                         (modelType, stringLocalizerFactory) => stringLocalizerFactory.Create(typeof(SingleType));
                 })
+#pragma warning disable CS0618
                 .SetCompatibilityVersion(CompatibilityVersion.Latest);
+#pragma warning restore CS0618
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

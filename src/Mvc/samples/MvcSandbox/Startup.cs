@@ -27,7 +27,9 @@ namespace MvcSandbox
             });
             services.AddServerSideBlazor();
             services.AddMvc()
+#pragma warning disable CS0618
                 .SetCompatibilityVersion(Microsoft.AspNetCore.Mvc.CompatibilityVersion.Latest);
+#pragma warning restore CS0618
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

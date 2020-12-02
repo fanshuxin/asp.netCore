@@ -178,7 +178,9 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="builder">The <see cref="IMvcBuilder"/>.</param>
         /// <param name="version">The <see cref="CompatibilityVersion"/> value to configure.</param>
         /// <returns>The <see cref="IMvcBuilder"/>.</returns>
+#pragma warning disable CS0618
         public static IMvcBuilder SetCompatibilityVersion(this IMvcBuilder builder, CompatibilityVersion version)
+#pragma warning restore CS0618
         {
             if (builder == null)
             {

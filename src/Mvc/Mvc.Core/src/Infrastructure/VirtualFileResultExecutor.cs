@@ -142,16 +142,5 @@ namespace Microsoft.AspNetCore.Mvc.Infrastructure
             result.FileProvider = _hostingEnvironment.WebRootFileProvider;
             return result.FileProvider;
         }
-
-        /// <summary>
-        /// Obsolete, this API is no longer called.
-        /// </summary>
-        /// <param name="fileInfo"></param>
-        /// <returns></returns>
-        [Obsolete("This API is no longer called.")]
-        protected virtual Stream GetFileStream(IFileInfo fileInfo)
-        {
-            return fileInfo.CreateReadStream();
-        }
     }
 }

@@ -16,9 +16,11 @@ namespace SecurityWebSite
         {
             // Add framework services.
             services.AddMvc(options => options.EnableEndpointRouting = false)
+#pragma warning disable CS0618
                 .SetCompatibilityVersion(CompatibilityVersion.Latest);
+#pragma warning restore CS0618
             services.AddAntiforgery();
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options => 
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
             {
                 options.LoginPath = "/Home/Login";
                 options.LogoutPath = "/Home/Logout";

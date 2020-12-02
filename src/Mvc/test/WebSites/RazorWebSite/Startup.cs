@@ -35,7 +35,9 @@ namespace RazorWebSite
                     options.HtmlHelperOptions.ValidationSummaryMessageElement = "validationSummaryElement";
                 })
                 .AddMvcLocalization(LanguageViewLocationExpanderFormat.SubFolder)
+#pragma warning disable CS0618
                 .SetCompatibilityVersion(CompatibilityVersion.Latest);
+#pragma warning restore CS0618
 
             services.AddTransient<InjectedHelper>();
             services.AddTransient<TaskReturningService>();

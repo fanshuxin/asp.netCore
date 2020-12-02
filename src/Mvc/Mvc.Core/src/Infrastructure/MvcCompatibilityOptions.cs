@@ -19,6 +19,8 @@ namespace Microsoft.AspNetCore.Mvc.Infrastructure
         /// Gets or sets the application's configured <see cref="Mvc.CompatibilityVersion"/>.
         /// </summary>
         /// <value>the default value is <see cref="CompatibilityVersion.Version_3_0"/>.</value>
+#pragma warning disable CS0618 // Type or member is obsolete
         public CompatibilityVersion CompatibilityVersion { get; set; } = CompatibilityVersion.Version_3_0;
+#pragma warning restore CS0618
     }
 }

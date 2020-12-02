@@ -13,7 +13,9 @@ namespace CorsWebSite
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers(ConfigureMvcOptions)
+#pragma warning disable CS0618
                 .SetCompatibilityVersion(CompatibilityVersion.Latest);
+#pragma warning restore CS0618
             services.Configure<CorsOptions>(options =>
             {
                 options.AddPolicy(

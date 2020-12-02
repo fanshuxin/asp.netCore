@@ -37,6 +37,7 @@ namespace Microsoft.AspNetCore.Mvc
     /// settings to match a particular minor release of ASP.NET Core MVC.
     /// </para>
     /// </remarks>
+    [Obsolete("This value is obsolete.")] // Remove after .NET 6.
     public enum CompatibilityVersion
     {
         /// <summary>

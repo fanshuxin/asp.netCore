@@ -193,6 +193,27 @@ APPLICATION_INFO::TryCreateApplication(IHttpContext& pHttpContext, const ShimOpt
         // may be easier to do a hard delete everytime.
         // we also may need to do this ourselves.
         path = options.QueryShadowCopyDirectory();
+        std::wstring physicalPath = pHttpContext.GetApplication()->GetApplicationPhysicalPath();
+
+        if (!path.is_absolute())
+        {
+            path = std::filesystem::absolute(std::filesystem::path(physicalPath) / path);
+        }
+
+        std::wstring shadowCopyPath = path;
+        if (shadowCopyPath.find(physicalPath) == 0)
+        {
+            // In the same directory, block.
+            return E_FAIL;
+        }
+
+        if (options.QueryCleanShadowCopyDirectory() && std::filesystem::exists(path))
+        {
+            std::filesystem::remove_all(path);
+        }
+
+        // Always does a copy on startup, as if there are not files to update
+        // this copy should be fast.
         std::filesystem::copy(pHttpContext.GetApplication()->GetApplicationPhysicalPath(), path, std::filesystem::copy_options::recursive | std::filesystem::copy_options::update_existing);
     }
    

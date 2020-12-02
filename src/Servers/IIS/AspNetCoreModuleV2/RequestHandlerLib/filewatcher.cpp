@@ -10,7 +10,8 @@
 FILE_WATCHER::FILE_WATCHER() :
     m_hCompletionPort(NULL),
     m_hChangeNotificationThread(NULL),
-    m_fThreadExit(FALSE)
+    m_fThreadExit(FALSE),
+    _fTrackDllChanges(FALSE)
 {
 }
 
@@ -18,6 +19,11 @@ FILE_WATCHER::~FILE_WATCHER()
 {
     StopMonitor();
 
+    WaitForMonitor();
+}
+
+void FILE_WATCHER::WaitForMonitor()
+{
     if (m_hChangeNotificationThread != NULL)
     {
         DWORD dwRetryCounter = 20;      // totally wait for 1s
@@ -246,15 +252,17 @@ HRESULT
                 pNotificationInfo->FileNameLength / sizeof(WCHAR)) == 0)
             {
                 fFileChanged = TRUE;
+                auto app = _pApplication.get();
+                app->m_detectedAppOffline = true;
                 break;
             }
+
             //
-            // this is the tricky part, how do we know which dlls here to listen for?
-            // app_offline was a great signal to know that we are done copying, now that doesn't necessarily exist
-            // What if we just look for dlls for now.
+            // Look for changes to dlls when shadow copying is enabled.
             //
-            // TODO make this based on a setting
-            if (_fTrackDllChanges && std::filesystem::path(pNotificationInfo->FileName).extension() == L"dll")
+            std::wstring notification(pNotificationInfo->FileName, pNotificationInfo->FileNameLength / sizeof(WCHAR));
+            std::filesystem::path notificationPath(notification);
+            if (_fTrackDllChanges && notificationPath.extension().compare(L".dll") == 0)
             {
                 fFileChanged = TRUE;
             }
@@ -333,6 +341,11 @@ FILE_WATCHER::StopMonitor()
     // we know that HandleChangeCompletion() call
     // can be ignored
     //
+    if (_lStopMonitorCalled)
+    {
+        return;
+    }
+
     InterlockedExchange(&_lStopMonitorCalled, 1);
     // signal the file watch thread to exit
     PostQueuedCompletionStatus(m_hCompletionPort, 0, FILE_WATCHER_SHUTDOWN_KEY, NULL);

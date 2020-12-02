@@ -29,6 +29,7 @@ void AppOfflineTrackingApplication::StopInternal(bool fServerInitiated)
 
     if (m_fileWatcher)
     {
+        // want to wait for that thread to exit?
         m_fileWatcher->StopMonitor();
         m_fileWatcher = nullptr;
     }
@@ -57,11 +58,22 @@ void AppOfflineTrackingApplication::OnAppOffline()
         return;
     }
 
-    LOG_INFOF(L"Received app_offline notification in application '%ls'", m_applicationPath.c_str());
-    EventLog::Info(
-        ASPNETCORE_EVENT_RECYCLE_APPOFFLINE,
-        ASPNETCORE_EVENT_RECYCLE_APPOFFLINE_MSG,
-        m_applicationPath.c_str());
+    if (m_detectedAppOffline)
+    {
+        LOG_INFOF(L"Received app_offline notification in application '%ls'", m_applicationPath.c_str());
+        EventLog::Info(
+            ASPNETCORE_EVENT_RECYCLE_APPOFFLINE,
+            ASPNETCORE_EVENT_RECYCLE_APPOFFLINE_MSG,
+            m_applicationPath.c_str());
+    }
+    else
+    {
+        LOG_INFOF(L"Received file change notification in application '%ls'", m_applicationPath.c_str());
+        EventLog::Info(
+            ASPNETCORE_EVENT_RECYCLE_APPOFFLINE,
+            ASPNETCORE_EVENT_RECYCLE_FILECHANGE_MSG,
+            m_applicationPath.c_str());
+    }
 
     Stop(/*fServerInitiated*/ false);
 }

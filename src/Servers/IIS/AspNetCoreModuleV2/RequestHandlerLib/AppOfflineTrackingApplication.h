@@ -37,6 +37,8 @@ public:
     VOID
     OnAppOffline();
 
+    bool                                         m_detectedAppOffline;
+
 private:
     HRESULT
     StartMonitoringAppOflineImpl();

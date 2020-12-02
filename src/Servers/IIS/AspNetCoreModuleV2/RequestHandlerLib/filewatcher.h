@@ -22,6 +22,8 @@ public:
 
     ~FILE_WATCHER();
 
+    void WaitForMonitor();
+
     HRESULT Create(
         _In_ PCWSTR                  pszDirectoryToMonitor,
         _In_ PCWSTR                  pszFileNameToMonitor,

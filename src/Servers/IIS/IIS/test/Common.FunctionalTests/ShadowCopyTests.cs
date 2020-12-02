@@ -108,34 +108,7 @@ namespace Microsoft.AspNetCore.Server.IIS.FunctionalTests
         }
 
         [ConditionalFact]
-        public async Task ShadowCopyPresentAlreadyQuick()
-        {
-            var directory = CreateTempDirectory();
-            var deploymentParameters = Fixture.GetBaseDeploymentParameters();
-            deploymentParameters.HandlerSettings["enableShadowCopy"] = "true";
-            deploymentParameters.HandlerSettings["shadowCopyDirectory"] = directory.FullName;
-            var deploymentResult = await DeployAsync(deploymentParameters);
-
-            DirectoryCopy(deploymentResult.ContentRoot, directory.FullName, copySubDirs: true);
-
-            await deploymentResult.HttpClient.GetStringAsync("Wow!");
-
-            // Check if directory can be deleted.
-            // Can't delete the folder but can delete all content in it.
-
-            var directoryInfo = new DirectoryInfo(deploymentResult.ContentRoot);
-            foreach (var fileInfo in directoryInfo.GetFiles())
-            {
-                fileInfo.Delete();
-            }
-
-            foreach (var dirInfo in directoryInfo.GetDirectories())
-            {
-                dirInfo.Delete(recursive: true);
-            }
-        }
-
-        [ConditionalFact]
+        [MaximumOSVersion(OperatingSystems.Windows, WindowsVersions.Win10_20H1, SkipReason = "Shutdown hangs https://github.com/dotnet/aspnetcore/issues/25107")]
         public async Task ShadowCopySingleFileChangedWorks()
         {
             var directory = CreateTempDirectory();
@@ -163,14 +136,12 @@ namespace Microsoft.AspNetCore.Server.IIS.FunctionalTests
             var fileContents = File.ReadAllBytes(dllPath);
             File.WriteAllBytes(dllPath, fileContents);
 
-            // verify app is restarted.
-            var response = await deploymentResult.HttpClient.GetAsync("Wow!");
-            Assert.False(response.IsSuccessStatusCode);
-            StopServer();
+            deploymentResult.AssertWorkerProcessStop();
             EventLogHelpers.VerifyEventLogEvent(deploymentResult, EventLogHelpers.ShutdownFileChange(deploymentResult), Logger);
         }
 
         [ConditionalFact]
+        [MaximumOSVersion(OperatingSystems.Windows, WindowsVersions.Win10_20H1, SkipReason = "Shutdown hangs https://github.com/dotnet/aspnetcore/issues/25107")]
         public async Task ShadowCopyE2EWorks()
         {
             var directory = CreateTempDirectory();
@@ -189,9 +160,8 @@ namespace Microsoft.AspNetCore.Server.IIS.FunctionalTests
             DirectoryCopy(deploymentResult.ContentRoot, secondTempDir.FullName, copySubDirs: true);
             DirectoryCopy(secondTempDir.FullName, deploymentResult.ContentRoot, copySubDirs: true);
 
-            var response = await deploymentResult.HttpClient.GetAsync("Wow!");
-            Assert.False(response.IsSuccessStatusCode);
-            StopServer();
+            deploymentResult.AssertWorkerProcessStop();
+
             EventLogHelpers.VerifyEventLogEvent(deploymentResult, EventLogHelpers.ShutdownFileChange(deploymentResult), Logger);
         }
 

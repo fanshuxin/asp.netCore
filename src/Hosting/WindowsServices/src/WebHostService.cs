@@ -22,7 +22,7 @@ namespace Microsoft.AspNetCore.Hosting.WindowsServices
         /// Creates an instance of <c>WebHostService</c> which hosts the specified web application.
         /// </summary>
         /// <param name="host">The configured web host containing the web application to host in the Windows service.</param>
-        public WebHostService(IWebHost host)
+        public WebHostService(IWebHost? host)
         {
             _host = host ?? throw new ArgumentNullException(nameof(host));
         }

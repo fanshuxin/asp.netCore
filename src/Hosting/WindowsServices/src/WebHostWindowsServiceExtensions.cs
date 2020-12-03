@@ -33,7 +33,7 @@ namespace Microsoft.AspNetCore.Hosting.WindowsServices
         ///         }
         ///     </code>
         /// </example>
-        public static void RunAsService(this IWebHost host)
+        public static void RunAsService(this IWebHost? host)
         {
             var webHostService = new WebHostService(host);
             ServiceBase.Run(webHostService);

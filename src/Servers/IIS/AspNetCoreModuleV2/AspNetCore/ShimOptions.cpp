@@ -10,7 +10,7 @@
 #define CS_ASPNETCORE_HANDLER_VERSION                    L"handlerVersion"
 #define CS_ASPNETCORE_SHADOW_COPY                        L"enableShadowCopy"
 #define CS_ASPNETCORE_SHADOW_COPY_DIRECTORY              L"shadowCopyDirectory"
-#define CS_ASPNETCORE_CLEAN_SHADOW_DIRECTORY_CONTENT    L"cleanShadowCopyDirectory"
+#define CS_ASPNETCORE_CLEAN_SHADOW_DIRECTORY_CONTENT     L"cleanShadowCopyDirectory"
 
 ShimOptions::ShimOptions(const ConfigurationSource &configurationSource) :
         m_hostingModel(HOSTING_UNKNOWN),

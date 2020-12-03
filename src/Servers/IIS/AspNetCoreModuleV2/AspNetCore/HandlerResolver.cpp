@@ -72,7 +72,7 @@ HandlerResolver::LoadRequestHandlerAssembly(const IHttpApplication &pApplication
 
             auto redirectionOutput = std::make_shared<StringStreamRedirectionOutput>();
 
-            hr = FindNativeAssemblyFromHostfxr(*options, pstrHandlerDllName, handlerDllPath, pApplication, shadowCopyPath, pConfiguration, redirectionOutput, errorContext);
+            hr = FindNativeAssemblyFromHostfxr(*options, pstrHandlerDllName, handlerDllPath, pApplication, pConfiguration, redirectionOutput, errorContext);
 
             auto output = redirectionOutput->GetOutput();
 
@@ -231,7 +231,6 @@ HandlerResolver::FindNativeAssemblyFromHostfxr(
     PCWSTR libraryName,
     std::wstring& handlerDllPath,
     const IHttpApplication &pApplication,
-    std::filesystem::path shadowCopyPath,
     const ShimOptions& pConfiguration,
     std::shared_ptr<StringStreamRedirectionOutput> stringRedirectionOutput,
     ErrorContext& errorContext

@@ -44,7 +44,8 @@ HRESULT AppOfflineTrackingApplication::StartMonitoringAppOflineImpl()
     m_fileWatcher = std::make_unique<FILE_WATCHER>();
     RETURN_IF_FAILED(m_fileWatcher->Create(m_applicationPath.c_str(),
         L"app_offline.htm",
-        true, // TODO 
+        /* fTrackDllChanges */ !m_shadowCopyDirectory.empty(),
+        m_shadowCopyDirectory,
         this));
 
     return S_OK;

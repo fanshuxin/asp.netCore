@@ -18,15 +18,13 @@ FILE_WATCHER::FILE_WATCHER() :
 FILE_WATCHER::~FILE_WATCHER()
 {
     StopMonitor();
-
-    WaitForMonitor();
+    WaitForMonitor(20);
 }
 
-void FILE_WATCHER::WaitForMonitor()
+void FILE_WATCHER::WaitForMonitor(DWORD dwRetryCounter)
 {
     if (m_hChangeNotificationThread != NULL)
     {
-        DWORD dwRetryCounter = 20;      // totally wait for 1s
         DWORD dwExitCode = STILL_ACTIVE;
 
         while (!m_fThreadExit && dwRetryCounter > 0)
@@ -61,10 +59,11 @@ FILE_WATCHER::Create(
     _In_ PCWSTR                  pszDirectoryToMonitor,
     _In_ PCWSTR                  pszFileNameToMonitor,
     _In_ bool                    fTrackDllChanges,
+    _In_ std::wstring            shadowCopyPath,
     _In_ AppOfflineTrackingApplication *pApplication
 )
 {
-
+    _shadowCopyPath = shadowCopyPath;
     RETURN_LAST_ERROR_IF_NULL(m_hCompletionPort = CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, 0, 0));
 
     RETURN_LAST_ERROR_IF_NULL(m_hChangeNotificationThread = CreateThread(NULL,
@@ -214,6 +213,7 @@ HRESULT
 --*/
 {
     BOOL                        fFileChanged = FALSE;
+    BOOL                        fDllChanged = FALSE;
 
     // When directory handle is closed then HandleChangeCompletion
     // happens with cbCompletion = 0 and dwCompletionStatus = 0
@@ -265,6 +265,7 @@ HRESULT
             if (_fTrackDllChanges && notificationPath.extension().compare(L".dll") == 0)
             {
                 fFileChanged = TRUE;
+                fDllChanged = TRUE;
             }
 
             //
@@ -287,6 +288,15 @@ HRESULT
     {
         // Reference application before
         _pApplication->ReferenceApplication();
+        if (fDllChanged)
+        {
+            // wait for all file changes to complete
+            PostQueuedCompletionStatus(m_hCompletionPort, 0, FILE_WATCHER_SHUTDOWN_KEY, NULL);
+            WaitForMonitor(100); // 5 seconds here.
+
+            // Copy contents before shutdown
+            RETURN_IF_FAILED(Environment::CopyToDirectory(_shadowCopyPath, _strDirectoryName.QueryStr(), false));
+        }
         RETURN_LAST_ERROR_IF(!QueueUserWorkItem(RunNotificationCallback, _pApplication.get(), WT_EXECUTEDEFAULT));
     }
 

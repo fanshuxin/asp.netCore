@@ -22,5 +22,7 @@ public:
     std::wstring GetDllDirectoryValue();
     static
     bool IsRunning64BitProcess();
+    static
+    HRESULT CopyToDirectory(std::filesystem::path destination, std::wstring source, bool cleanDest);
 };
 

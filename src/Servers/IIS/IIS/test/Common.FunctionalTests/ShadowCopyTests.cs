@@ -26,9 +26,12 @@ namespace Microsoft.AspNetCore.Server.IIS.FunctionalTests
         {
         }
 
-        // TODO check absolute and relative directory paths.
         // TODO check if app init module works here
         // TODO verify app init on azure app services.
+        // TODO check out of proc?
+        // TODO check startup failure
+        // TODO check shutting down?
+
         [ConditionalFact]
         public async Task ShadowCopyWorks()
         {
@@ -115,7 +118,7 @@ namespace Microsoft.AspNetCore.Server.IIS.FunctionalTests
             var deploymentParameters = Fixture.GetBaseDeploymentParameters();
             deploymentParameters.HandlerSettings["enableShadowCopy"] = "true";
             deploymentParameters.HandlerSettings["shadowCopyDirectory"] = directory.FullName;
-            //deploymentParameters.ApplicationPath = directory.FullName;
+
             var deploymentResult = await DeployAsync(deploymentParameters);
 
             DirectoryCopy(deploymentResult.ContentRoot, directory.FullName, copySubDirs: true);

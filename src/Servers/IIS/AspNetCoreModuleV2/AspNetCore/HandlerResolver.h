@@ -27,7 +27,6 @@ private:
         PCWSTR libraryName,
         std::wstring& handlerDllPath,
         const IHttpApplication &pApplication,
-        std::filesystem::path shadowCopyPath,
         const ShimOptions& pConfiguration,
         std::shared_ptr<StringStreamRedirectionOutput> stringRedirectionOutput,
         ErrorContext& errorContext);

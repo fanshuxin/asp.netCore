@@ -8,6 +8,7 @@
 #include <functional>
 #include "iapplication.h"
 #include "HandleWrapper.h"
+#include "Environment.h"
 
 #define FILE_WATCHER_SHUTDOWN_KEY           (ULONG_PTR)(-1)
 #define FILE_WATCHER_ENTRY_BUFFER_SIZE      4096
@@ -22,12 +23,13 @@ public:
 
     ~FILE_WATCHER();
 
-    void WaitForMonitor();
+    void WaitForMonitor(DWORD dwRetryCounter);
 
     HRESULT Create(
         _In_ PCWSTR                  pszDirectoryToMonitor,
         _In_ PCWSTR                  pszFileNameToMonitor,
         _In_ bool                    fTrackDllChanges,
+        _In_ std::wstring            shadowCopyPath,
         _In_ AppOfflineTrackingApplication *pApplication
     );
 
@@ -56,6 +58,7 @@ private:
     STRU                    _strFullName;
     LONG                    _lStopMonitorCalled {};
     bool                    _fTrackDllChanges;
+    std::wstring            _shadowCopyPath;
     OVERLAPPED              _overlapped;
     std::unique_ptr<AppOfflineTrackingApplication, IAPPLICATION_DELETER> _pApplication;
 };

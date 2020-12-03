@@ -163,7 +163,6 @@ private:
     std::atomic<PFN_REQUESTS_DRAINED_HANDLER>    m_RequestsDrainedHandler;
 
     std::wstring                    m_dotnetExeKnownLocation;
-    std::wstring                    m_shadowCopyDirectory;
 
     std::atomic_bool                m_blockManagedCallbacks;
     bool                            m_Initialized;

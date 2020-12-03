@@ -5,8 +5,9 @@
 
 InProcessApplicationBase::InProcessApplicationBase(
     IHttpServer& pHttpServer,
-    IHttpApplication& pHttpApplication)
-    : AppOfflineTrackingApplication(pHttpApplication),
+    IHttpApplication& pHttpApplication,
+    std::wstring shadowCopyDirectory)
+    : AppOfflineTrackingApplication(pHttpApplication, shadowCopyDirectory),
       m_fRecycleCalled(FALSE),
       m_pHttpServer(pHttpServer)
 {

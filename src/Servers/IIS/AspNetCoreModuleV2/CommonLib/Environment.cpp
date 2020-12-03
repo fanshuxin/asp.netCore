@@ -151,3 +151,23 @@ bool Environment::IsRunning64BitProcess()
     GetNativeSystemInfo(&systemInfo);
     return systemInfo.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64;
 }
+
+HRESULT Environment::CopyToDirectory(std::filesystem::path destination, std::wstring source, bool cleanDest)
+{
+    std::wstring tempPath = destination;
+    if (tempPath.find(source) == 0)
+    {
+        // In the same directory, block.
+        return E_FAIL;
+    }
+
+    if (cleanDest && std::filesystem::exists(destination))
+    {
+        std::filesystem::remove_all(destination);
+    }
+
+    // Always does a copy on startup, as if there are not files to update
+    // this copy should be fast.
+    std::filesystem::copy(source, destination, std::filesystem::copy_options::recursive | std::filesystem::copy_options::update_existing);
+    return S_OK;
+}

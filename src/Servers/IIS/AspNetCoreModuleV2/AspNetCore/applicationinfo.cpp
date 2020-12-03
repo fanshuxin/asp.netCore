@@ -181,50 +181,28 @@ APPLICATION_INFO::TryCreateApplication(IHttpContext& pHttpContext, const ShimOpt
         }
     }
 
-    // shadow copy here.
-    // For now, copy the entire contents but keep the current directory the same.
-    // TODO eventually compare dates here on dlls (newer dlls will always be taken).
-
-    std::filesystem::path path;
+    std::filesystem::path shadowCopyPath;
 
     if (options.QueryShadowCopyEnabled())
     {
-        // TODO what about deleting assets that are present in the shadow copy that aren't in the directory.
-        // may be easier to do a hard delete everytime.
-        // we also may need to do this ourselves.
-        path = options.QueryShadowCopyDirectory();
+        shadowCopyPath = options.QueryShadowCopyDirectory();
         std::wstring physicalPath = pHttpContext.GetApplication()->GetApplicationPhysicalPath();
-
-        if (!path.is_absolute())
+        if (!shadowCopyPath.is_absolute())
         {
-            path = std::filesystem::absolute(std::filesystem::path(physicalPath) / path);
+            shadowCopyPath = std::filesystem::absolute(std::filesystem::path(physicalPath) / shadowCopyPath);
         }
 
-        std::wstring shadowCopyPath = path;
-        if (shadowCopyPath.find(physicalPath) == 0)
-        {
-            // In the same directory, block.
-            return E_FAIL;
-        }
-
-        if (options.QueryCleanShadowCopyDirectory() && std::filesystem::exists(path))
-        {
-            std::filesystem::remove_all(path);
-        }
-
-        // Always does a copy on startup, as if there are not files to update
-        // this copy should be fast.
-        std::filesystem::copy(pHttpContext.GetApplication()->GetApplicationPhysicalPath(), path, std::filesystem::copy_options::recursive | std::filesystem::copy_options::update_existing);
+        RETURN_IF_FAILED(Environment::CopyToDirectory(shadowCopyPath, physicalPath, options.QueryCleanShadowCopyDirectory()));
     }
    
-    RETURN_IF_FAILED(m_handlerResolver.GetApplicationFactory(*pHttpContext.GetApplication(), path, m_pApplicationFactory, options, error));
+    RETURN_IF_FAILED(m_handlerResolver.GetApplicationFactory(*pHttpContext.GetApplication(), shadowCopyPath, m_pApplicationFactory, options, error));
     LOG_INFO(L"Creating handler application");
 
     IAPPLICATION * newApplication;
     RETURN_IF_FAILED(m_pApplicationFactory->Execute(
         &m_pServer,
         &pHttpContext,
-        path,
+        shadowCopyPath,
         &newApplication));
 
     m_pApplication.reset(newApplication);

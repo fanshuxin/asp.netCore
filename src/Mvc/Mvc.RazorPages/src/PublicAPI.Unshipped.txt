@@ -1,1 +1,3 @@
 #nullable enable
+Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure.ICompiledPageActionDescriptorProvider
+~virtual Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure.PageLoader.LoadAsync(Microsoft.AspNetCore.Mvc.RazorPages.PageActionDescriptor actionDescriptor, Microsoft.AspNetCore.Http.EndpointMetadataCollection endpointMetadata) -> System.Threading.Tasks.Task<Microsoft.AspNetCore.Mvc.RazorPages.CompiledPageActionDescriptor>

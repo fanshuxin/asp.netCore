@@ -45,7 +45,6 @@ HRESULT AppOfflineTrackingApplication::StartMonitoringAppOflineImpl()
     RETURN_IF_FAILED(m_fileWatcher->Create(m_applicationPath.c_str(),
         L"app_offline.htm",
         /* fTrackDllChanges */ !m_shadowCopyDirectory.empty(),
-        m_shadowCopyDirectory,
         this));
 
     return S_OK;

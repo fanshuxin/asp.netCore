@@ -31,8 +31,8 @@ private:
 class ShuttingDownApplication : public InProcessApplicationBase
 {
 public:
-    ShuttingDownApplication(IHttpServer& pHttpServer, IHttpApplication& pHttpApplication)
-        : InProcessApplicationBase(pHttpServer, pHttpApplication, std::wstring())
+    ShuttingDownApplication(IHttpServer& pHttpServer, IHttpApplication& pHttpApplication, std::wstring shadowCopy)
+        : InProcessApplicationBase(pHttpServer, pHttpApplication, shadowCopy)
     {
     }
 

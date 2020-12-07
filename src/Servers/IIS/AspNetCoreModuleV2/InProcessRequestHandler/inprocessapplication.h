@@ -23,7 +23,8 @@ public:
         IHttpApplication& pApplication,
         std::unique_ptr<InProcessOptions> pConfig,
         APPLICATION_PARAMETER *pParameters,
-        DWORD                  nParameters);
+        DWORD                  nParameters,
+        std::wstring shadowCopy);
 
     ~IN_PROCESS_APPLICATION();
 
@@ -114,7 +115,8 @@ public:
         APPLICATION_PARAMETER* pParameters,
         DWORD nParameters,
         std::unique_ptr<IN_PROCESS_APPLICATION, IAPPLICATION_DELETER>& application,
-        ErrorContext& errorContext);
+        ErrorContext& errorContext,
+        std::wstring shadowCopy);
 
 private:
     struct ExecuteClrContext: std::enable_shared_from_this<ExecuteClrContext>
@@ -177,7 +179,6 @@ private:
     std::shared_ptr<StringStreamRedirectionOutput> m_stringRedirectionOutput;
 
     inline static const LPCSTR      s_exeLocationParameterName = "InProcessExeLocation";
-
 
     VOID
     UnexpectedThreadExit(const ExecuteClrContext& context) const;

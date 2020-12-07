@@ -93,7 +93,6 @@ APPLICATION_INFO::CreateApplication(IHttpContext& pHttpContext)
             errorContext.statusCode = 500i16;
             errorContext.subStatusCode = 0i16;
 
-
             const auto hr = TryCreateApplication(pHttpContext, options, errorContext);
 
             if (FAILED_LOG(hr))

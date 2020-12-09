@@ -2415,12 +2415,14 @@ virtual Microsoft.AspNetCore.Mvc.ModelBinding.Validation.ValidationVisitor.Visit
 ~virtual Microsoft.AspNetCore.Mvc.Infrastructure.ObjectResultExecutor.ExecuteAsync(Microsoft.AspNetCore.Mvc.ActionContext context, Microsoft.AspNetCore.Mvc.ObjectResult result) -> System.Threading.Tasks.Task
 ~virtual Microsoft.AspNetCore.Mvc.Infrastructure.PhysicalFileResultExecutor.ExecuteAsync(Microsoft.AspNetCore.Mvc.ActionContext context, Microsoft.AspNetCore.Mvc.PhysicalFileResult result) -> System.Threading.Tasks.Task
 ~virtual Microsoft.AspNetCore.Mvc.Infrastructure.PhysicalFileResultExecutor.GetFileInfo(string path) -> Microsoft.AspNetCore.Mvc.Infrastructure.PhysicalFileResultExecutor.FileMetadata
+~virtual Microsoft.AspNetCore.Mvc.Infrastructure.PhysicalFileResultExecutor.GetFileStream(string path) -> System.IO.Stream
 ~virtual Microsoft.AspNetCore.Mvc.Infrastructure.PhysicalFileResultExecutor.WriteFileAsync(Microsoft.AspNetCore.Mvc.ActionContext context, Microsoft.AspNetCore.Mvc.PhysicalFileResult result, Microsoft.Net.Http.Headers.RangeItemHeaderValue range, long rangeLength) -> System.Threading.Tasks.Task
 ~virtual Microsoft.AspNetCore.Mvc.Infrastructure.RedirectResultExecutor.ExecuteAsync(Microsoft.AspNetCore.Mvc.ActionContext context, Microsoft.AspNetCore.Mvc.RedirectResult result) -> System.Threading.Tasks.Task
 ~virtual Microsoft.AspNetCore.Mvc.Infrastructure.RedirectToActionResultExecutor.ExecuteAsync(Microsoft.AspNetCore.Mvc.ActionContext context, Microsoft.AspNetCore.Mvc.RedirectToActionResult result) -> System.Threading.Tasks.Task
 ~virtual Microsoft.AspNetCore.Mvc.Infrastructure.RedirectToPageResultExecutor.ExecuteAsync(Microsoft.AspNetCore.Mvc.ActionContext context, Microsoft.AspNetCore.Mvc.RedirectToPageResult result) -> System.Threading.Tasks.Task
 ~virtual Microsoft.AspNetCore.Mvc.Infrastructure.RedirectToRouteResultExecutor.ExecuteAsync(Microsoft.AspNetCore.Mvc.ActionContext context, Microsoft.AspNetCore.Mvc.RedirectToRouteResult result) -> System.Threading.Tasks.Task
 ~virtual Microsoft.AspNetCore.Mvc.Infrastructure.VirtualFileResultExecutor.ExecuteAsync(Microsoft.AspNetCore.Mvc.ActionContext context, Microsoft.AspNetCore.Mvc.VirtualFileResult result) -> System.Threading.Tasks.Task
+~virtual Microsoft.AspNetCore.Mvc.Infrastructure.VirtualFileResultExecutor.GetFileStream(Microsoft.Extensions.FileProviders.IFileInfo fileInfo) -> System.IO.Stream
 ~virtual Microsoft.AspNetCore.Mvc.Infrastructure.VirtualFileResultExecutor.WriteFileAsync(Microsoft.AspNetCore.Mvc.ActionContext context, Microsoft.AspNetCore.Mvc.VirtualFileResult result, Microsoft.Extensions.FileProviders.IFileInfo fileInfo, Microsoft.Net.Http.Headers.RangeItemHeaderValue range, long rangeLength) -> System.Threading.Tasks.Task
 ~virtual Microsoft.AspNetCore.Mvc.ModelBinderAttribute.BindingSource.get -> Microsoft.AspNetCore.Mvc.ModelBinding.BindingSource
 ~virtual Microsoft.AspNetCore.Mvc.ModelBinderAttribute.BindingSource.set -> void

@@ -68,6 +68,7 @@ Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure.RazorPageAdapter
 Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure.RazorPageAdapter.EnsureRenderedBodyOrSections() -> void
 Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure.RazorPageAdapter.IsLayoutBeingRendered.get -> bool
 Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure.RazorPageAdapter.IsLayoutBeingRendered.set -> void
+Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure.RazorPageAttribute
 Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure.ServiceBasedPageModelActivatorProvider
 Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure.ServiceBasedPageModelActivatorProvider.ServiceBasedPageModelActivatorProvider() -> void
 Microsoft.AspNetCore.Mvc.RazorPages.NonHandlerAttribute
@@ -307,6 +308,8 @@ virtual Microsoft.AspNetCore.Mvc.Filters.PageHandlerExecutedContext.ExceptionHan
 ~Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure.RazorPageAdapter.SectionWriters.get -> System.Collections.Generic.IDictionary<string, Microsoft.AspNetCore.Mvc.Razor.RenderAsyncDelegate>
 ~Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure.RazorPageAdapter.ViewContext.get -> Microsoft.AspNetCore.Mvc.Rendering.ViewContext
 ~Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure.RazorPageAdapter.ViewContext.set -> void
+~Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure.RazorPageAttribute.RazorPageAttribute(string path, System.Type viewType, string routeTemplate) -> void
+~Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure.RazorPageAttribute.RouteTemplate.get -> string
 ~Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure.ServiceBasedPageModelActivatorProvider.CreateActivator(Microsoft.AspNetCore.Mvc.RazorPages.CompiledPageActionDescriptor descriptor) -> System.Func<Microsoft.AspNetCore.Mvc.RazorPages.PageContext, object>
 ~Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure.ServiceBasedPageModelActivatorProvider.CreateReleaser(Microsoft.AspNetCore.Mvc.RazorPages.CompiledPageActionDescriptor descriptor) -> System.Action<Microsoft.AspNetCore.Mvc.RazorPages.PageContext, object>
 ~Microsoft.AspNetCore.Mvc.RazorPages.PageActionDescriptor.AreaName.get -> string
